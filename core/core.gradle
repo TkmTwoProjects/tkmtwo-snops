@@ -1,0 +1,135 @@
+
+apply plugin: 'java'
+apply plugin: 'maven'
+
+apply plugin: 'checkstyle'
+apply plugin: 'findbugs'
+
+
+configurations {
+  doc { 
+    transitive false
+  }
+}
+
+checkstyle {
+  configFile = new File(rootDir, "config/checkstyle.xml")
+  sourceSets = [sourceSets.main, sourceSets.test]
+  //sourceSets = [sourceSets.main]
+}
+
+compileJava {
+  //options.compilerArgs << '-Xlint:unchecked,deprecation'
+    options.compilerArgs << '-Xlint:unchecked'
+}
+
+dependencies {
+  doc "com.google.code.findbugs:jsr305:3.0.0"
+
+  compile "com.fasterxml.jackson.core:jackson-databind:${depVersionJackson}"
+  compile "com.google.guava:guava:${depVersionGuava}"
+  compile "com.tkmtwo:tkmtwo-common:${depVersionTkmTwoCommon}"
+  compile "com.tkmtwo:tkmtwo-hc-core:${depVersionTkmTwoHc}"
+  compile "com.tkmtwo:tkmtwo-interpolate:${depVersionTkmTwoInterpolate}"
+  compile "org.apache.httpcomponents:httpclient:${depVersionHttpClient}"
+  compile "org.reflections:reflections:${depVersionReflections}"
+  compile "org.slf4j:slf4j-api:${depVersionSlf4J}"
+  
+  runtime "ch.qos.logback:logback-classic:${depVersionLogback}"
+  runtime "ch.qos.logback:logback-core:${depVersionLogback}"
+  runtime "org.slf4j:jcl-over-slf4j:${depVersionSlf4J}"
+  runtime "org.slf4j:jul-to-slf4j:${depVersionSlf4J}"
+  runtime "org.slf4j:log4j-over-slf4j:${depVersionSlf4J}"
+  
+  testCompile "junit:junit:${depVersionJunit}"
+  testCompile "org.springframework:spring-test:${depVersionSpringFramework}"
+}
+
+configurations {
+  all*.exclude module: 'commons-logging'
+  all*.exclude module: 'log4j'
+}
+
+jar {
+  baseName = rootProject.name
+  appendix = project.name
+}
+
+uploadArchives {
+  repositories {
+    mavenDeployer {
+      repository(url: "file://$buildDir/repo")
+      //repository(url: "file:///C:/gits/tkmtwo-mvn-repo/release")
+    }
+  }
+}
+
+
+sourceSets {
+  test {
+    resources {
+      //srcDir "${System.env.HOME}/.gradle/resources"
+      srcDir "${System.properties['user.home']}/.gradle/resources"
+    }
+  }
+}
+
+
+
+
+/*
+task copyToLib(type: Copy) {
+    into "$buildDir/output/lib"
+    from configurations.runtime
+}
+*/
+
+
+
+
+findbugs {
+  //toolVersion = "2.0.1"
+  //sourceSets = [sourceSets.test]
+  ignoreFailures = true
+  reportsDir = file("$project.buildDir/reports/findbugs")
+  effort = "max"
+  reportLevel = "low"
+  //reportLevel = "high"
+  //visitors = ["FindSqlInjection", "SwitchFallthrough"]
+  //omitVisitors = ["FindNonShortCircuit"]
+  //includeFilter = file("$rootProject.projectDir/config/findbugs/includeFilter.xml")
+  //excludeFilter = file("$rootProject.projectDir/config/findbugs/excludeFilter.xml")
+}
+
+
+findbugsMain {
+  reports {
+    xml { enabled = false }
+    html {
+      enabled = true
+      destination "$project.buildDir/reports/findbugs/findbugsMain.html"
+    }
+  }
+}
+
+findbugsTest {
+  reports {
+    xml { enabled = false }
+    html {
+      enabled = true
+      destination "$project.buildDir/reports/findbugs/findbugsTest.html"
+    }
+  }
+}
+
+
+
+javadoc {
+  options.author = true
+  options.header = rootProject.name + '-' + project.name
+  //options.header = rootProject.name
+  options.links(project.ext.javadocLinks)
+  title = rootProject.name + '-' + project.name
+  //title = rootProject.name
+  classpath += configurations.doc
+}
