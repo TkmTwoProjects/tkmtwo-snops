@@ -10,6 +10,7 @@ import static org.junit.Assert.assertNotNull;
 
 import com.tkmtwo.hc.uri.UserInfo;
 import com.tkmtwo.snops.CompanyInstance;
+import java.util.List;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
@@ -61,6 +62,14 @@ public final class CompanyKeyedUserInfosTest {
     assertEquals("unameX", bcOne.getUserName());
     assertEquals("passwdX", bcOne.getPassword());
     
+    
+    //
+    // Get values and verify
+    //
+    List<UserInfo> userInfos = ics.getValues();
+    assertEquals(2, userInfos.size());
+
+    
   }
   
   
@@ -103,6 +112,14 @@ public final class CompanyKeyedUserInfosTest {
     assertNotNull(bcOne);
     assertEquals("unameX", bcOne.getUserName());
     assertEquals("passwdX", bcOne.getPassword());
+    
+    
+    //
+    // Get values and verify
+    //
+    List<UserInfo> userInfos = ics.getValues();
+    assertEquals(2, userInfos.size());
+
     
   }
 

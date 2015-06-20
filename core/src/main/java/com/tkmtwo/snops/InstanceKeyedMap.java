@@ -98,6 +98,10 @@ public class InstanceKeyedMap<T> {
     return ImmutableList.copyOf(getValuesMap().keySet());
   }
   
+  public List<T> getValues() {
+    return ImmutableList.copyOf(getValuesMap().values());
+  }
+  
   public int size() {
     return getValuesMap().size();
   }
