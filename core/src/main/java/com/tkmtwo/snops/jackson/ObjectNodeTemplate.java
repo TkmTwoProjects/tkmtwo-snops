@@ -2,15 +2,12 @@ package com.tkmtwo.snops.jackson;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.TkmTwoConditions.checkNotBlank;
-import static com.google.common.base.TkmTwoJointers.COMMA_JOINER;
 import static com.google.common.base.TkmTwoStrings.isBlank;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableList;
 import com.tkmtwo.hc.uri.Params;
-import com.tkmtwo.interpolate.Interpolator;
-import com.tkmtwo.interpolate.PositionalInterpolatorCallback;
 import com.tkmtwo.snops.IncorrectResultSizeException;
 import com.tkmtwo.snops.TableOperations;
 import com.tkmtwo.snops.client.AbstractTableTemplate;
@@ -136,10 +133,10 @@ public class ObjectNodeTemplate
     
     Params params = new Params();
     if (!getFieldNames().isEmpty()) {
-      logger.trace("fieldNames is NOT empty, so I'm adding some stuff..");
+      logger.trace("fieldNames IS NOT empty, so I'm adding them.");
       params.putAll(TableParams.SYSPARM_FIELDS, getFieldNames());
     } else {
-      logger.trace("fieldNames is indeed empty...nothing to add");
+      logger.trace("fieldNames IS empty, nothing to add");
     }
     
     URI thisUri = buildUri(sysId, params);
@@ -157,36 +154,21 @@ public class ObjectNodeTemplate
   }
   
   
-  public List<ObjectNode> getMany(String qs) {
-    return getMany(qs, EMPTY_QS_VALUES, new Params());
-  }
-  public List<ObjectNode> getMany(String qs, Params params) {
-    return getMany(qs, EMPTY_QS_VALUES, params);
-  }
-  public List<ObjectNode> getMany(String qsTemplate, List<String> qsValues) {
-    return getMany(qsTemplate, qsValues, new Params());
-  }
-  public List<ObjectNode> getMany(String qsTemplate, List<String> qsValues, Params params) {
-    List<ObjectNode> l = findMany(qsTemplate, qsValues, params);
+  
+  
+  
+  
+  public List<ObjectNode> getMany(Params params) {
+    List<ObjectNode> l = findMany(params);
     if (l.isEmpty()) {
-      throw new IncorrectResultSizeException("Expected more than zero records from " + qsTemplate);
+      throw new IncorrectResultSizeException("Expected more than zero records from query.");
     }
     return l;
   }
+
   
-  
-  
-  public ObjectNode getOne(String qs) {
-    return getOne(qs, EMPTY_QS_VALUES, new Params());
-  }
-  public ObjectNode getOne(String qs, Params params) {
-    return getOne(qs, EMPTY_QS_VALUES, params);
-  }
-  public ObjectNode getOne(String qsTemplate, List<String> qsValues) {
-    return getOne(qsTemplate, qsValues, new Params());
-  }
-  public ObjectNode  getOne(String qsTemplate, List<String> qsValues, Params params) {
-    ObjectNode on = findOne(qsTemplate, qsValues, params);
+  public ObjectNode  getOne(Params params) {
+    ObjectNode on = findOne(params);
     if (on == null) {
       throw new IncorrectResultSizeException(1, 0);
     }
@@ -194,57 +176,22 @@ public class ObjectNodeTemplate
   }
   
   
-  
-  
-  public ObjectNode findOne(String qs) {
-    return findOne(qs, EMPTY_QS_VALUES, new Params());
-  }
-  public ObjectNode findOne(String qs, Params params) {
-    return findOne(qs, EMPTY_QS_VALUES, params);
-  }
-  public ObjectNode findOne(String qsTemplate, List<String> qsValues) {
-    return findOne(qsTemplate, qsValues, new Params());
-  }
-  public ObjectNode findOne(String qsTemplate, List<String> qsValues, Params params) {
-    List<ObjectNode> l = findMany(qsTemplate, qsValues, params);
+  public ObjectNode findOne(Params params) {
+    List<ObjectNode> l = findMany(params);
     if (l.size() == 0) { return null; }
     if (l.size() == 1) { return l.get(0); }
     throw new IncorrectResultSizeException(1, l.size());
   }
   
   
-  
-  
-  public List<ObjectNode> findMany(String qs) {
-    return findMany(qs, EMPTY_QS_VALUES, new Params());
-  }
-  public List<ObjectNode> findMany(String qs, Params params) {
-    return findMany(qs, EMPTY_QS_VALUES, params);
-  }
-  public List<ObjectNode> findMany(String qsTemplate, List<String> qsValues) {
-    return findMany(qsTemplate, qsValues, new Params());
-  }
-  public List<ObjectNode> findMany(String qsTemplate, List<String> qsValues, Params params) {
-    checkNotBlank(qsTemplate, "Need a query string template.");
-    checkNotNull(qsValues, "Query string values may not be null.");
+  public List<ObjectNode> findMany(Params params) {
     checkNotNull(params, "Need some params.");
     
     if (logger.isTraceEnabled()) {
-      logger.trace("findMany() using qsTemplate({}) and qsValues({}) and params({})",
-                   qsTemplate, COMMA_JOINER.join(qsValues), params);
+      logger.trace("findMany() using params({})", params);
     }
     
-    String qs = null;
-    if (qsValues.isEmpty()) {
-      qs = qsTemplate;
-    } else {
-      PositionalInterpolatorCallback<String> ic =
-        new PositionalInterpolatorCallback<>(qsValues);
-      qs = Interpolator.interpolate(qsTemplate, ic);
-    }
-    
-    
-    params.put(TableParams.SYSPARM_QUERY, qs);
+    //params.put(TableParams.SYSPARM_QUERY, qs);
     params.putAll(TableParams.SYSPARM_FIELDS, getFieldNames());
 
     URI thisUri = buildUri(params);
@@ -272,6 +219,11 @@ public class ObjectNodeTemplate
     return returnList;
   }
 
+  
+  
+  
+  
+  
   
   
   public void delete(ObjectNode on) {

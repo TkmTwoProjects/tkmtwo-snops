@@ -2,16 +2,13 @@ package com.tkmtwo.snops.client;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.TkmTwoConditions.checkNotBlank;
-import static com.google.common.base.TkmTwoJointers.COMMA_JOINER;
 import static com.google.common.base.TkmTwoStrings.isBlank;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
+//import com.google.common.collect.ImmutableList;
 import com.tkmtwo.hc.uri.Params;
 import com.tkmtwo.hc.uri.URIBuilder;
 import java.net.URI;
 //import java.util.List;
-import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -23,16 +20,17 @@ import org.springframework.util.StringUtils;
  *
  *
  */
-public abstract class AbstractTableTemplate
+public abstract class AbstractAggregateTemplate
   implements InitializingBean {
   
   protected final Logger logger = LoggerFactory.getLogger(getClass()); 
 
-  public static final Set<String> EMPTY_FIELD_NAMES = ImmutableSet.of();
   //public static final List<String> EMPTY_QS_VALUES = ImmutableList.of();
   
-  public static final String DEFAULT_API_PATH = "api/now/table";
+  public static final String DEFAULT_API_PATH = "api/now/stats";
   public static final String CONTAINER_NODE_NAME = "result";
+  public static final String STATS_NODE_NAME = "stats";
+  
   
   private static final Params EMPTY_PARAMS = new Params();
   
@@ -42,28 +40,13 @@ public abstract class AbstractTableTemplate
   private String tableName;
   
   private String uriBase;
-  private Set<String> fieldNames;
   
   
-  protected AbstractTableTemplate() {}
+  protected AbstractAggregateTemplate() {}
 
-  protected AbstractTableTemplate(RestClient rc, String p, String tn) {
-    this(rc, p, tn, EMPTY_FIELD_NAMES);
-  }
-  protected AbstractTableTemplate(RestClient rc, String p, String tn, Iterable<String> fns) {
-    setRestClient(rc);
-    setApiPath(p);
-    setTableName(tn);
-    setFieldNames(fns);
-  }
-  
-  protected AbstractTableTemplate(RestClient rc, String tn) {
-    this(rc, tn, EMPTY_FIELD_NAMES);
-  }
-  protected AbstractTableTemplate(RestClient rc, String tn, Iterable<String> fns) {
+  protected AbstractAggregateTemplate(RestClient rc, String tn) {
     setRestClient(rc);
     setTableName(tn);
-    setFieldNames(fns);
   }
   
                        
@@ -85,45 +68,6 @@ public abstract class AbstractTableTemplate
   protected RestClient getRestClient() { return restClient; }
   protected void setRestClient(RestClient rc) { restClient = rc; }
 
-
-  public void addFieldNames(Iterable<String> is) {
-    if (is == null) { return; }
-    ImmutableSet.Builder<String> isb = new ImmutableSet.Builder<String>();
-    isb.addAll(getFieldNames());
-    isb.addAll(is);
-    fieldNames = isb.build();
-  }
-  public void setFieldNames(Iterable<String> is) {
-    if (is == null) {
-      fieldNames = EMPTY_FIELD_NAMES;
-      return;
-    }
-    
-    ImmutableSet.Builder<String> isb = new ImmutableSet.Builder<String>();
-    isb.addAll(is);
-    fieldNames = isb.build();
-    
-    if (fieldNames.size() > 0
-        && !fieldNames.contains("sys_id")) {
-      addFieldNames(ImmutableList.of("sys_id"));
-    }
-
-  }
-  
-  public Set<String> getFieldNames() {
-    if (fieldNames == null) {
-      fieldNames = EMPTY_FIELD_NAMES;
-    }
-    return fieldNames;
-  }
-  
-  
-  
-  
-  
-  
-  
-  
   
   
   
@@ -146,8 +90,8 @@ public abstract class AbstractTableTemplate
     
     String fullBase = sb.toString();
     
-    params.put(TableParams.SYSPARM_DISPLAY_VALUE, "false");
-    params.put(TableParams.SYSPARM_EXCLUDE_REFERENCE_LINK, "true");
+    params.put(AggregateParams.SYSPARM_DISPLAY_VALUE, "false");
+
     
     URI uri = URIBuilder.fromUri(fullBase).withParams(params).build();
     return uri;
@@ -164,7 +108,6 @@ public abstract class AbstractTableTemplate
                + "/" + checkNotBlank(getTableName()));
     
     logger.trace("UriBase is {}", getUriBase());
-    logger.trace("FieldNames are {}", COMMA_JOINER.join(getFieldNames()));
     
     
   }

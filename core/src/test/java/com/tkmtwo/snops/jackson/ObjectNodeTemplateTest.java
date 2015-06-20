@@ -7,11 +7,12 @@ import static org.junit.Assert.assertNotNull;
 //import static org.junit.Assert.fail;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.tkmtwo.hc.uri.Params;
 import com.tkmtwo.snops.AbstractSnopsTest;
 import com.tkmtwo.snops.TableOperations;
+import com.tkmtwo.snops.client.TableParams;
 import org.junit.Before;
 import org.junit.Test;
-
 
 /**
  *
@@ -32,8 +33,10 @@ public class ObjectNodeTemplateTest
   
   @Test
   public void test00010FindOneAndGet() {
-    String qs = "number=INC0000003";
-    ObjectNode incOne = onOps.findOne(qs);
+    Params params = new TableParams.Builder()
+      .query("number=INC0000003")
+      .build();
+    ObjectNode incOne = onOps.findOne(params);
     assertNotNull(incOne);
 
     ObjectNode incTwo = onOps.get(incOne.get("sys_id").asText());

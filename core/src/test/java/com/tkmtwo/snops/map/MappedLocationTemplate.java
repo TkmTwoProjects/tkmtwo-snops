@@ -1,8 +1,9 @@
 package com.tkmtwo.snops.map;
 
 
-import com.google.common.collect.ImmutableList;
+import com.tkmtwo.hc.uri.Params;
 import com.tkmtwo.snops.client.RestClient;
+import com.tkmtwo.snops.client.TableParams;
 
 
 /**
@@ -19,7 +20,11 @@ public class MappedLocationTemplate
   }
   
   public MappedLocation findByName(String name) {
-    return findOne("name=${0}", ImmutableList.of(name));
+    Params params = new TableParams.Builder()
+      .queryTemplate("name=${0}")
+      .queryValues(name)
+      .build();
+    return findOne(params);
   }
   
 }

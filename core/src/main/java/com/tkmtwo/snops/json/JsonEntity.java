@@ -6,13 +6,13 @@ import static com.google.common.base.TkmTwoStrings.isBlank;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.MoreObjects;
-import com.google.common.collect.ImmutableSet;
+//import com.google.common.collect.ImmutableSet;
 import com.tkmtwo.snops.time.DateTimeFormatters;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Objects;
-import java.util.Set;
+//import java.util.Set;
 
 /**
  *
@@ -20,8 +20,6 @@ import java.util.Set;
  *
  */
 public class JsonEntity {
-  
-  public static final Set<String> EMPTY_FIELD_NAMES = ImmutableSet.of();
   
   private String instanceName;
   private String tableName;

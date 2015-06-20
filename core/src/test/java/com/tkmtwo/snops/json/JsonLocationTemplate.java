@@ -1,7 +1,8 @@
 package com.tkmtwo.snops.json;
 
-import com.google.common.collect.ImmutableList;
+import com.tkmtwo.hc.uri.Params;
 import com.tkmtwo.snops.client.RestClient;
+import com.tkmtwo.snops.client.TableParams;
 
 
 /**
@@ -22,7 +23,11 @@ public class JsonLocationTemplate
   }
   
   public JsonLocation findByName(String name) {
-    return findOne("name=${0}", ImmutableList.of(name));
+    Params params = new TableParams.Builder()
+      .queryTemplate("name=${0}")
+      .queryValues(name)
+      .build();
+    return findOne(params);
   }
   
 }

@@ -11,7 +11,7 @@ subprojects {
   }
   
   group = 'com.tkmtwo'
-  version = '0.0.0'
+  version = '0.1.0'
   
   ext {
     
@@ -45,7 +45,6 @@ subprojects {
     javadocLinks = [
       "http://docs.spring.io/spring/docs/current/javadoc-api/",
       "http://fasterxml.github.io/jackson-databind/javadoc/2.5/",
-      //"http://fasterxml.github.io/jackson-databind/javadoc/2.3.0/",
       "http://docs.oracle.com/javase/8/docs/api/"
     ] as String[]
     

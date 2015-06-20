@@ -3,11 +3,11 @@ package com.tkmtwo.snops.map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-//import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertTrue;
 //import static org.junit.Assert.fail;
 
-import com.google.common.collect.ImmutableList;
 import com.tkmtwo.snops.AbstractSnopsTest;
+import com.tkmtwo.snops.client.TableParams;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,16 +30,29 @@ public class MappedLocationTest
     tableTemplate.afterPropertiesSet();
     tableOps = tableTemplate;
   }
+  
+  @Test
+  public void test00010BlankParams() {
+    List<MappedLocation> l =
+      tableOps.getMany(new TableParams.Builder().build());
+    assertTrue(l.size() > 400);
+  }
+
 
   @Test
-  public void test00020FindParts() {
-    List<MappedLocation> l = tableOps.getMany("nameSTARTSWITH${0}", ImmutableList.of("Parts"));
-    assertEquals(2, l.size());
+  public void test00011FindByCompanyName() {
+    //List<MappedLocation> l = tableOps.getMany("nameSTARTSWITH${0}", ImmutableList.of("Parts"));
+    List<MappedLocation> l =
+      tableOps.getMany(new TableParams.Builder()
+                       .queryTemplate("company.name=${0}")
+                       .queryValues("ACME North America")
+                       .build());
+    assertEquals(372, l.size());
   }
   
   
   @Test
-  public void test00010FindAndCreate() {
+  public void test00020FindAndCreate() {
     String locName = "Parts Unknown Mapped";
     String locStreet = "1313 Mockingbird Lane";
 

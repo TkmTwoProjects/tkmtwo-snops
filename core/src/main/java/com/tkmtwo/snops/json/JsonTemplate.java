@@ -27,21 +27,33 @@ public class JsonTemplate<T extends JsonEntity>
   private TableOperations<ObjectNode> onOps = null;
   
   
-  protected JsonTemplate(RestClient rc, String p, String tn, Class<T> tc) {
+  protected JsonTemplate(RestClient rc,
+                         String p,
+                         String tn,
+                         Class<T> tc) {
     super(rc, p, tn);
     setTableClass(tc);
   }
-  protected JsonTemplate(RestClient rc, String p, String tn, Iterable<String> fns, Class<T> tc) {
+  protected JsonTemplate(RestClient rc,
+                         String p,
+                         String tn,
+                         Iterable<String> fns,
+                         Class<T> tc) {
     super(rc, p, tn, fns);
     setTableClass(tc);
   }
 
-  protected JsonTemplate(RestClient rc, String tn, Class<T> tc) {
+  protected JsonTemplate(RestClient rc,
+                         String tn,
+                         Class<T> tc) {
     super(rc, tn);
     setTableClass(tc);
   }
   
-  protected JsonTemplate(RestClient rc, String tn, Iterable<String> fns, Class<T> tc) {
+  protected JsonTemplate(RestClient rc,
+                         String tn,
+                         Iterable<String> fns,
+                         Class<T> tc) {
     super(rc, tn, fns);
     setTableClass(tc);
   }
@@ -54,7 +66,10 @@ public class JsonTemplate<T extends JsonEntity>
     super.afterPropertiesSet();
     if (onOps == null) {
       ObjectNodeTemplate ont =
-        new ObjectNodeTemplate(getRestClient(), getApiPath(), getTableName(), getFieldNames());
+        new ObjectNodeTemplate(getRestClient(),
+                               getApiPath(),
+                               getTableName(),
+                               getFieldNames());
       ont.afterPropertiesSet();
       onOps = ont;
     }
@@ -86,62 +101,25 @@ public class JsonTemplate<T extends JsonEntity>
   
   
     
-  
-  public T getOne(String qs) {
-    return newTee(onOps.getOne(qs));
-  }
-  public T getOne(String qs, Params params) {
-    return newTee(onOps.getOne(qs, params));
-  }
-  public T getOne(String qsTemplate, List<String> qsValues) {
-    return newTee(onOps.getOne(qsTemplate, qsValues));
-  }
-  public T getOne(String qsTemplate, List<String> qsValues, Params params) {
-    return newTee(onOps.getOne(qsTemplate, qsValues, params));
+  public T getOne(Params params) {
+    return newTee(onOps.getOne(params));
   }
   
-  public List<T> getMany(String qs) {
-    return newTees(onOps.getMany(qs));
-  }
-  public List<T> getMany(String qs, Params params) {
-    return newTees(onOps.getMany(qs, params));
-  }
-  public List<T> getMany(String qsTemplate, List<String> qsValues) {
-    return newTees(onOps.getMany(qsTemplate, qsValues));
-  }
-  public List<T> getMany(String qsTemplate, List<String> qsValues, Params params) {
-    return newTees(onOps.getMany(qsTemplate, qsValues, params));
+  
+  public List<T> getMany(Params params) {
+    return newTees(onOps.getMany(params));
   }
 
 
 
-
-  public T findOne(String qs) {
-    return newTee(onOps.findOne(qs));
+  public T findOne(Params params) {
+    return newTee(onOps.findOne(params));
   }
-  public T findOne(String qs, Params params) {
-    return newTee(onOps.findOne(qs, params));
-  }
-  public T findOne(String qsTemplate, List<String> qsValues) {
-    return newTee(onOps.findOne(qsTemplate, qsValues));
-  }
-  public T findOne(String qsTemplate, List<String> qsValues, Params params) {
-    return newTee(onOps.findOne(qsTemplate, qsValues, params));
-  }
-
   
   
-  public List<T> findMany(String qs) {
-    return newTees(onOps.findMany(qs));
-  }
-  public List<T> findMany(String qs, Params params) {
-    return newTees(onOps.findMany(qs, params));
-  }
-  public List<T> findMany(String qsTemplate, List<String> qsValues) {
-    return newTees(onOps.findMany(qsTemplate, qsValues));
-  }
-  public List<T> findMany(String qsTemplate, List<String> qsValues, Params params) {
-    return newTees(onOps.findMany(qsTemplate, qsValues, params));
+  
+  public List<T> findMany(Params params) {
+    return newTees(onOps.findMany(params));
   }
 
   

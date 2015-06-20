@@ -17,24 +17,12 @@ public interface TableOperations<T> {
   void delete(String sysId);
   void delete(T t);
   
-  T getOne(String qs);
-  T getOne(String qs, Params params);
-  T getOne(String qsTemplate, List<String> qsValues);
-  T getOne(String qsTemplate, List<String> qsValues, Params params);
+  T getOne(Params params);
   
-  List<T> getMany(String qs);
-  List<T> getMany(String qs, Params params);
-  List<T> getMany(String qsTemplate, List<String> qsValues);
-  List<T> getMany(String qsTemplate, List<String> qsValues, Params params);
+  List<T> getMany(Params params);
   
-  T findOne(String qs);
-  T findOne(String qs, Params params);
-  T findOne(String qsTemplate, List<String> qsValues);
-  T findOne(String qsTemplate, List<String> qsValues, Params params);
+  T findOne(Params params);
   
-  List<T> findMany(String qs);
-  List<T> findMany(String qs, Params params);
-  List<T> findMany(String qsTemplate, List<String> qsValues);
-  List<T> findMany(String qsTemplate, List<String> qsValues, Params params);
+  List<T> findMany(Params params);
   
 }
