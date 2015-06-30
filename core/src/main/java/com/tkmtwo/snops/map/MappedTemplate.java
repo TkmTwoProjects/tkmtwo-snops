@@ -144,8 +144,8 @@ public class MappedTemplate<T extends MappedEntity>
         .getJacksonMessageConverter()
         .getObjectMapper()
         .treeToValue(on, getTableClass());
-      t.setInstanceName(getRestClient().getInstance().getName());
-      t.setTableName(getTableName());
+      t.setServiceNowInstanceName(getRestClient().getInstance().getName());
+      t.setServiceNowTableName(getTableName());
       return t;
     } catch (JsonProcessingException jpe) {
       throw new UncategorizedException("Boom on newTee", jpe);

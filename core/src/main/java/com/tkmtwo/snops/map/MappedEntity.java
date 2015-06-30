@@ -11,8 +11,8 @@ import java.util.Objects;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class MappedEntity {
   
-  private String instanceName;
-  private String tableName;
+  private String serviceNowInstanceName;
+  private String serviceNowTableName;
 
 
   
@@ -35,11 +35,11 @@ public class MappedEntity {
   private String sysUpdatedBy;
   
   
-  public String getInstanceName() { return instanceName; }
-  public void setInstanceName(String s) { instanceName = s; }
+  public String getServiceNowInstanceName() { return serviceNowInstanceName; }
+  public void setServiceNowInstanceName(String s) { serviceNowInstanceName = s; }
   
-  public String getTableName() { return tableName; }
-  public void setTableName(String s) { tableName = s; }
+  public String getServiceNowTableName() { return serviceNowTableName; }
+  public void setServiceNowTableName(String s) { serviceNowTableName = s; }
   
   public String getSysId() { return sysId; }
   public void setSysId(String s) { sysId = s; }
@@ -71,15 +71,15 @@ public class MappedEntity {
     MappedEntity impl = (MappedEntity) o;
     
     return
-      Objects.equals(getInstanceName(), impl.getInstanceName())
-      && Objects.equals(getTableName(), impl.getTableName())
+      Objects.equals(getServiceNowInstanceName(), impl.getServiceNowInstanceName())
+      && Objects.equals(getServiceNowTableName(), impl.getServiceNowTableName())
       && Objects.equals(getSysId(), impl.getSysId());
   }
   
   
   @Override
   public int hashCode() {
-    return Objects.hash(getInstanceName(), getTableName(), getSysId());
+    return Objects.hash(getServiceNowInstanceName(), getServiceNowTableName(), getSysId());
   }
   
   

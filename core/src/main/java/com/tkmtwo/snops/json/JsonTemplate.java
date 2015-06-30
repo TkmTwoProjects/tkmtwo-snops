@@ -134,8 +134,8 @@ public class JsonTemplate<T extends JsonEntity>
     } catch (InstantiationException | IllegalAccessException ex) {
       throw new RuntimeException("Could not instantiate.", ex);
     }
-    t.setInstanceName(getRestClient().getInstance().getName());
-    t.setTableName(getTableName());
+    t.setServiceNowInstanceName(getRestClient().getInstance().getName());
+    t.setServiceNowTableName(getTableName());
     t.setObjectNode(on);
     return t;
   }

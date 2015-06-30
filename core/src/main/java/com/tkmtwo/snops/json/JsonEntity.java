@@ -21,36 +21,36 @@ import java.util.Objects;
  */
 public class JsonEntity {
   
-  private String instanceName;
-  private String tableName;
+  private String serviceNowInstanceName;
+  private String serviceNowTableName;
   private ObjectNode objectNode;
   
   
   public JsonEntity() { }
   
   public JsonEntity(String tn) {
-    setTableName(tn);
+    setServiceNowTableName(tn);
   }
   
   public JsonEntity(String tn, ObjectNode on) {
-    setTableName(tn);
+    setServiceNowTableName(tn);
     setObjectNode(on);
   }
   
   public JsonEntity(JsonEntity te) {
-    setInstanceName(te.getInstanceName());
-    setTableName(te.getTableName());
+    setServiceNowInstanceName(te.getServiceNowInstanceName());
+    setServiceNowTableName(te.getServiceNowTableName());
     setObjectNode(te.getObjectNode().deepCopy());
   }
   
   
   
   
-  public String getInstanceName() { return instanceName; }
-  public void setInstanceName(String s) { instanceName = s; }
+  public String getServiceNowInstanceName() { return serviceNowInstanceName; }
+  public void setServiceNowInstanceName(String s) { serviceNowInstanceName = s; }
   
-  public String getTableName() { return tableName; }
-  public void setTableName(String s) { tableName = s; }
+  public String getServiceNowTableName() { return serviceNowTableName; }
+  public void setServiceNowTableName(String s) { serviceNowTableName = s; }
   
   public ObjectNode getObjectNode() {
     if (objectNode == null) {
@@ -144,15 +144,15 @@ public class JsonEntity {
     JsonEntity impl = (JsonEntity) o;
     
     return
-      Objects.equals(getInstanceName(), impl.getInstanceName())
-      && Objects.equals(getTableName(), impl.getTableName())
+      Objects.equals(getServiceNowInstanceName(), impl.getServiceNowInstanceName())
+      && Objects.equals(getServiceNowTableName(), impl.getServiceNowTableName())
       && Objects.equals(getSysId(), impl.getSysId());
   }
   
   
   @Override
   public int hashCode() {
-    return Objects.hash(getInstanceName(), getTableName(), getSysId());
+    return Objects.hash(getServiceNowInstanceName(), getServiceNowTableName(), getSysId());
   }
   
   
@@ -160,8 +160,8 @@ public class JsonEntity {
   @Override
   public String toString() {
     return MoreObjects.toStringHelper(this)
-      .add("instanceName", getInstanceName())
-      .add("tableName", getTableName())
+      .add("serviceNowInstanceName", getServiceNowInstanceName())
+      .add("serviceNowTableName", getServiceNowTableName())
       .add("objectNode", getObjectNode())
       .toString();
   }

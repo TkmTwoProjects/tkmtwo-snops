@@ -29,23 +29,23 @@ public class MappedLocation
     MappedLocation impl = (MappedLocation) o;
     
     return
-      Objects.equals(getInstanceName(), impl.getInstanceName())
-      && Objects.equals(getTableName(), impl.getTableName())
+      Objects.equals(getServiceNowInstanceName(), impl.getServiceNowInstanceName())
+      && Objects.equals(getServiceNowTableName(), impl.getServiceNowTableName())
       && Objects.equals(getSysId(), impl.getSysId());
   }
   
   
   @Override
   public int hashCode() {
-    return Objects.hash(getInstanceName(), getTableName(), getSysId());
+    return Objects.hash(getServiceNowInstanceName(), getServiceNowTableName(), getSysId());
   }
 
   
   @Override
   public String toString() {
     return MoreObjects.toStringHelper(this)
-      .add("instanceName", getInstanceName())
-      .add("tableName", getTableName())
+      .add("serviceNowInstanceName", getServiceNowInstanceName())
+      .add("serviceNowTableName", getServiceNowTableName())
       .add("sysId", getSysId())
       .add("sysModCount", getSysModCount())
       .add("sysCreatedOn",
