@@ -2,6 +2,7 @@ package com.tkmtwo.snops.map;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
+import com.tkmtwo.snops.time.DateTimeFormatters;
 import java.util.Objects;
 
 public class MappedLocation
@@ -45,6 +46,18 @@ public class MappedLocation
     return MoreObjects.toStringHelper(this)
       .add("instanceName", getInstanceName())
       .add("tableName", getTableName())
+      .add("sysId", getSysId())
+      .add("sysModCount", getSysModCount())
+      .add("sysCreatedOn",
+           (getSysCreatedOn() == null)
+           ? ""
+           : DateTimeFormatters.LOCAL_DATETIME_EXTENDED.format(getSysCreatedOn()))
+      .add("sysCreatedBy", getSysCreatedBy())
+      .add("sysUpdatedOn",
+           (getSysUpdatedOn() == null)
+           ? ""
+           : DateTimeFormatters.LOCAL_DATETIME_EXTENDED.format(getSysUpdatedOn()))
+      .add("sysUpdatedBy", getSysUpdatedBy())
       .add("name", getName())
       .add("street", getStreet())
       .toString();

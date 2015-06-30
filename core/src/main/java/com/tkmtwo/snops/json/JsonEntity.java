@@ -70,6 +70,12 @@ public class JsonEntity {
     return null;
   }
   
+  public String getSysId(String s) {
+    String sysId = getString("s");
+    if (!isBlank(sysId)) { return checkSysId(sysId); }
+    return null;
+  }
+  
   public String getString(String s) {
     if (getObjectNode().hasNonNull(s)) {
       return getObjectNode().get(s).asText();

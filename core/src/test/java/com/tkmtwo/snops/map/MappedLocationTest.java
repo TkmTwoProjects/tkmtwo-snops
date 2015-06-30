@@ -73,15 +73,21 @@ public class MappedLocationTest
     assertNotNull(loc);
     confess("After first save", loc);
     
+    
     assertEquals(locName, loc.getName());
     assertEquals("", loc.getStreet());
+    assertEquals(0, loc.getSysModCount());
 
     //
     // Update the street and save
     //
     loc.setStreet(locStreet);
+    loc.setSysCreatedBy("noone");
+    loc.setSysModCount(73);
+
     loc = tableOps.save(loc);
     confess("After second save", loc);
+    assertEquals(1, loc.getSysModCount());
     
     //
     // Verify change in street

@@ -29,6 +29,10 @@ import org.springframework.web.client.HttpClientErrorException;
 public class ObjectNodeTemplate
   extends AbstractTableTemplate
   implements TableOperations<ObjectNode> {
+
+  private List<ObjectNodeVisitor> createVisitors = null;
+  private List<ObjectNodeVisitor> readVisitors = null;
+  private List<ObjectNodeVisitor> updateVisitors = null;
   
   
   public ObjectNodeTemplate(RestClient rc, String p, String tn) {
@@ -44,10 +48,35 @@ public class ObjectNodeTemplate
     super(rc, tn, fns);
   }
                        
-  
-  
-  
+  public void afterPropertiesSet() {
+    super.afterPropertiesSet();
+    
+    if (getCreateVisitors() == null) {
+      logger.info("No create visitors declared, adding FieldRemovingObjectNodeVisitor.GLOBAL_DEFAULT_FIELDS_REMOVER");
+      createVisitors = ImmutableList.of(FieldRemovingObjectNodeVisitor.GLOBAL_DEFAULT_FIELDS_REMOVER);
+    }
+    if (getReadVisitors() == null) {
+      logger.info("No read visitors declared.");
+      readVisitors = ImmutableList.of();
+    }
+    if (getUpdateVisitors() == null) {
+      logger.info("No update visitors declared, adding FieldRemovingObjectNodeVisitor.GLOBAL_DEFAULT_FIELDS_REMOVER");
+      updateVisitors = ImmutableList.of(FieldRemovingObjectNodeVisitor.GLOBAL_DEFAULT_FIELDS_REMOVER);
+    }
+    
+  }
 
+  public List<ObjectNodeVisitor> getCreateVisitors() { return createVisitors; }
+  public void setCreateVisitors(List<ObjectNodeVisitor> l) { createVisitors = ImmutableList.copyOf(l); }
+
+  public List<ObjectNodeVisitor> getReadVisitors() { return readVisitors; }
+  public void setReadVisitors(List<ObjectNodeVisitor> l) { readVisitors = ImmutableList.copyOf(l); }
+
+  public List<ObjectNodeVisitor> getUpdateVisitors() { return updateVisitors; }
+  public void setUpdateVisitors(List<ObjectNodeVisitor> l) { updateVisitors = ImmutableList.copyOf(l); }
+  
+  
+  
   private static String getString(ObjectNode on, String s) {
     checkNotNull(on, "Need an ObjectNode.");
     checkNotNull(s, "Need a field name.");
@@ -55,6 +84,14 @@ public class ObjectNodeTemplate
       return on.get(s).asText();
     }
     return null;
+  }
+  
+  private void visit(ObjectNode on, List<ObjectNodeVisitor> onvs) {
+    if (on == null) { return; }
+    if (onvs == null || onvs.isEmpty()) { return; }
+    for (ObjectNodeVisitor onv : onvs) {
+      onv.visit(on);
+    }
   }
   
   public ObjectNode save(ObjectNode on) {
@@ -74,6 +111,7 @@ public class ObjectNodeTemplate
   
   public ObjectNode create(ObjectNode on) {
     checkNotNull(on, "Need an ObjectNode to save.");
+    visit(on, getCreateVisitors());
     
     if (logger.isTraceEnabled()) {
       logger.trace("create() creating {}", on);
@@ -93,13 +131,14 @@ public class ObjectNodeTemplate
     if (logger.isTraceEnabled()) {
       logger.trace("create(t) received JSON {}", objectNode);
     }
-
+    visit(objectNode, getReadVisitors());
     return (ObjectNode) objectNode.get(CONTAINER_NODE_NAME);
   }
   
 
   public ObjectNode update(ObjectNode on) {
     checkNotNull(on, "Need an ObjectNode to update.");
+    visit(on, getUpdateVisitors());
     
     String sysId = getString(on, "sys_id");
     checkNotBlank(sysId, "ObjectNode needs a sysId to be updated.");
@@ -149,7 +188,8 @@ public class ObjectNodeTemplate
     if (logger.isTraceEnabled()) {
       logger.trace("get() received JSON {}", objectNode);
     }
-
+    
+    visit(objectNode, getReadVisitors());
     return (ObjectNode) objectNode.get(CONTAINER_NODE_NAME);
   }
   
@@ -215,6 +255,10 @@ public class ObjectNodeTemplate
     List<ObjectNode> returnList = new ArrayList<>();
     for (JsonNode jn : resultNode.get(CONTAINER_NODE_NAME)) {
       returnList.add((ObjectNode) jn);
+    }
+    
+    for (ObjectNode on : returnList) {
+      visit(on, getReadVisitors());
     }
     return returnList;
   }
