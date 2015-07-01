@@ -71,7 +71,7 @@ public class JsonEntity {
   }
   
   public String getSysId(String s) {
-    String sysId = getString("s");
+    String sysId = getString(s);
     if (!isBlank(sysId)) { return checkSysId(sysId); }
     return null;
   }
