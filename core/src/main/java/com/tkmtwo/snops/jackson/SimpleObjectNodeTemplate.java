@@ -2,23 +2,28 @@ package com.tkmtwo.snops.jackson;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.TkmTwoConditions.checkNotBlank;
+import static com.google.common.base.TkmTwoJointers.COMMA_JOINER;
 import static com.google.common.base.TkmTwoStrings.isBlank;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.tkmtwo.hc.uri.Params;
+import com.tkmtwo.hc.uri.URIBuilder;
 import com.tkmtwo.snops.IncorrectResultSizeException;
-import com.tkmtwo.snops.TableOperations;
-import com.tkmtwo.snops.client.AbstractTableTemplate;
 import com.tkmtwo.snops.client.RestClient;
 import com.tkmtwo.snops.client.TableParams;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.http.HttpStatus;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
-
 
 
 /**
@@ -26,31 +31,134 @@ import org.springframework.web.client.HttpClientErrorException;
  *
  *
  */
-public class ObjectNodeTemplate
-  extends AbstractTableTemplate
-  implements TableOperations<ObjectNode> {
+public class SimpleObjectNodeTemplate
+  implements InitializingBean {
+  
+  protected final Logger logger = LoggerFactory.getLogger(getClass()); 
 
+  public static final Set<String> EMPTY_FIELD_NAMES = ImmutableSet.of();
+  
+  public static final String DEFAULT_API_PATH = "api/now/table";
+  public static final String CONTAINER_NODE_NAME = "result";
+  
+  private static final Params EMPTY_PARAMS = new Params();
+  
+  private RestClient restClient;
+  private Set<String> fieldNames;
+  
   private List<ObjectNodeVisitor> createVisitors = null;
   private List<ObjectNodeVisitor> readVisitors = null;
   private List<ObjectNodeVisitor> updateVisitors = null;
+
   
   
-  public ObjectNodeTemplate(RestClient rc, String p, String tn) {
-    super(rc, p, tn);
+  public SimpleObjectNodeTemplate(RestClient rc) {
+    this(rc, EMPTY_FIELD_NAMES);
   }
-  public ObjectNodeTemplate(RestClient rc, String p, String tn, Iterable<String> fns) {
-    super(rc, p, tn, fns);
+  public SimpleObjectNodeTemplate(RestClient rc, Iterable<String> fns) {
+    setRestClient(rc);
+    setFieldNames(fns);
   }
-  public ObjectNodeTemplate(RestClient rc, String tn) {
-    super(rc, tn);
+  
+  protected RestClient getRestClient() { return restClient; }
+  protected void setRestClient(RestClient rc) { restClient = rc; }
+
+
+  public void addFieldNames(Iterable<String> is) {
+    if (is == null) { return; }
+    ImmutableSet.Builder<String> isb = new ImmutableSet.Builder<String>();
+    isb.addAll(getFieldNames());
+    isb.addAll(is);
+    fieldNames = isb.build();
   }
-  public ObjectNodeTemplate(RestClient rc, String tn, Iterable<String> fns) {
-    super(rc, tn, fns);
-  }
-                       
-  public void afterPropertiesSet() {
-    super.afterPropertiesSet();
+  public void setFieldNames(Iterable<String> is) {
+    if (is == null) {
+      fieldNames = EMPTY_FIELD_NAMES;
+      return;
+    }
     
+    ImmutableSet.Builder<String> isb = new ImmutableSet.Builder<String>();
+    isb.addAll(is);
+    fieldNames = isb.build();
+    
+    if (fieldNames.size() > 0
+        && !fieldNames.contains("sys_id")) {
+      addFieldNames(ImmutableList.of("sys_id"));
+    }
+
+  }
+  
+  public Set<String> getFieldNames() {
+    if (fieldNames == null) {
+      fieldNames = EMPTY_FIELD_NAMES;
+    }
+    return fieldNames;
+  }
+  
+  public List<ObjectNodeVisitor> getCreateVisitors() { return createVisitors; }
+  public void setCreateVisitors(List<ObjectNodeVisitor> l) { createVisitors = ImmutableList.copyOf(l); }
+
+  public List<ObjectNodeVisitor> getReadVisitors() { return readVisitors; }
+  public void setReadVisitors(List<ObjectNodeVisitor> l) { readVisitors = ImmutableList.copyOf(l); }
+
+  public List<ObjectNodeVisitor> getUpdateVisitors() { return updateVisitors; }
+  public void setUpdateVisitors(List<ObjectNodeVisitor> l) { updateVisitors = ImmutableList.copyOf(l); }
+  
+  
+  
+  /*  
+  private String uriBase(String tn) {
+    return uriBase(DEFAULT_API_PATH, tn);
+  }
+  */
+
+  private String uriBase(String ap, String tn) {
+    return checkNotBlank(getRestClient().getInstance().getScheme())
+      + "://" + checkNotBlank(getRestClient().getInstance().getFqdn())
+      + "/" + checkNotBlank(ap)
+      + "/" + checkNotBlank(tn);
+  }
+  
+  
+  
+  
+  
+  
+  
+  protected URI buildUri(String apiPath, String tableName) {
+    return buildUri(apiPath, tableName, null, EMPTY_PARAMS);
+  }
+  protected URI buildUri(String apiPath, String tableName, String path) {
+    return buildUri(apiPath, tableName, path, EMPTY_PARAMS);
+  }
+  protected URI buildUri(String apiPath, String tableName, Params params) {
+    return buildUri(apiPath, tableName, null, params);
+  }
+  protected URI buildUri(String apiPath, String tableName, String path, Params params) {
+    
+    StringBuffer sb = new StringBuffer();
+    sb.append(uriBase(apiPath, tableName));
+    if (StringUtils.hasText(path)) {
+      sb.append("/").append(path);
+    }
+    
+    String fullBase = sb.toString();
+    
+    params.put(TableParams.SYSPARM_DISPLAY_VALUE, "false");
+    params.put(TableParams.SYSPARM_EXCLUDE_REFERENCE_LINK, "true");
+    
+    URI uri = URIBuilder.fromUri(fullBase).withParams(params).build();
+    return uri;
+  }
+  
+  
+  public void afterPropertiesSet() {
+    logger.trace("Coming up.");
+    checkNotNull(getRestClient(), "Need a RestClient.");
+    
+    logger.trace("FieldNames are {}", COMMA_JOINER.join(getFieldNames()));
+    
+
     if (getCreateVisitors() == null) {
       logger.info("No create visitors declared, adding FieldRemovingObjectNodeVisitor.GLOBAL_DEFAULT_FIELDS_REMOVER");
       createVisitors = ImmutableList.of(FieldRemovingObjectNodeVisitor.GLOBAL_DEFAULT_FIELDS_REMOVER);
@@ -63,19 +171,14 @@ public class ObjectNodeTemplate
       logger.info("No update visitors declared, adding FieldRemovingObjectNodeVisitor.GLOBAL_DEFAULT_FIELDS_REMOVER");
       updateVisitors = ImmutableList.of(FieldRemovingObjectNodeVisitor.GLOBAL_DEFAULT_FIELDS_REMOVER);
     }
+
+    
     
   }
-
-  public List<ObjectNodeVisitor> getCreateVisitors() { return createVisitors; }
-  public void setCreateVisitors(List<ObjectNodeVisitor> l) { createVisitors = ImmutableList.copyOf(l); }
-
-  public List<ObjectNodeVisitor> getReadVisitors() { return readVisitors; }
-  public void setReadVisitors(List<ObjectNodeVisitor> l) { readVisitors = ImmutableList.copyOf(l); }
-
-  public List<ObjectNodeVisitor> getUpdateVisitors() { return updateVisitors; }
-  public void setUpdateVisitors(List<ObjectNodeVisitor> l) { updateVisitors = ImmutableList.copyOf(l); }
   
   
+
+
   
   private static String getString(ObjectNode on, String s) {
     checkNotNull(on, "Need an ObjectNode.");
@@ -94,22 +197,28 @@ public class ObjectNodeTemplate
     }
   }
   
-  public ObjectNode save(ObjectNode on) {
+  public ObjectNode save(String tableName, ObjectNode on) {
+    return save(DEFAULT_API_PATH, tableName, on);
+  }
+  public ObjectNode save(String apiPath, String tableName, ObjectNode on) {
     checkNotNull(on, "Need an ObjectNode to save.");
 
     String sysId = getString(on, "sys_id");
     
     if (isBlank(sysId)) {
-      return create(on);
+      return create(apiPath, tableName, on);
     } else {
-      return update(on);
+      return update(apiPath, tableName, on);
     }
   }
   
   
   
   
-  public ObjectNode create(ObjectNode on) {
+  public ObjectNode create(String tableName, ObjectNode on) {
+    return create(DEFAULT_API_PATH, tableName, on);
+  }
+  public ObjectNode create(String apiPath, String tableName, ObjectNode on) {
     checkNotNull(on, "Need an ObjectNode to save.");
     visit(on, getCreateVisitors());
     
@@ -120,7 +229,7 @@ public class ObjectNodeTemplate
     Params params = new Params();
     params.putAll(TableParams.SYSPARM_FIELDS, getFieldNames());
 
-    URI thisUri = buildUri(params);
+    URI thisUri = buildUri(apiPath, tableName, params);
     if (logger.isTraceEnabled()) {
       logger.trace("{} create() using URI {}", getRestClient().getUserSummary(), thisUri);
     }
@@ -136,7 +245,10 @@ public class ObjectNodeTemplate
   }
   
 
-  public ObjectNode update(ObjectNode on) {
+  public ObjectNode update(String tableName, ObjectNode on) {
+    return update(DEFAULT_API_PATH, tableName, on);
+  }
+  public ObjectNode update(String apiPath, String tableName, ObjectNode on) {
     checkNotNull(on, "Need an ObjectNode to update.");
     visit(on, getUpdateVisitors());
     
@@ -152,19 +264,22 @@ public class ObjectNodeTemplate
     Params params = new Params();
     params.put(TableParams.SYSPARM_FIELDS, "sys_id");
     
-    URI thisUri = buildUri(sysId, params);
+    URI thisUri = buildUri(apiPath, tableName, sysId, params);
     if (logger.isTraceEnabled()) {
       logger.trace("{} update() using URI {}", getRestClient().getUserSummary(), thisUri);
     }
     
     getRestClient().getRestTemplate().put(thisUri, on);
-    return get(sysId);
+    return get(apiPath, tableName, sysId);
   }
 
   
 
 
-  public ObjectNode get(String sysId) {
+  public ObjectNode get(String tableName, String sysId) {
+    return get(DEFAULT_API_PATH, tableName, sysId);
+  }
+  public ObjectNode get(String apiPath, String tableName, String sysId) {
     checkNotBlank(sysId, "Need a sysId to retrieve.");
     if (logger.isTraceEnabled()) {
       logger.trace("{} get() getting {}", getRestClient().getUserSummary(), sysId);
@@ -178,7 +293,7 @@ public class ObjectNodeTemplate
       logger.trace("fieldNames IS empty, nothing to add");
     }
     
-    URI thisUri = buildUri(sysId, params);
+    URI thisUri = buildUri(apiPath, tableName, sysId, params);
     if (logger.isTraceEnabled()) {
       logger.trace("{} get() using URI {}", getRestClient().getUserSummary(), thisUri);
     }
@@ -198,8 +313,11 @@ public class ObjectNodeTemplate
   
   
   
-  public List<ObjectNode> getMany(Params params) {
-    List<ObjectNode> l = findMany(params);
+  public List<ObjectNode> getMany(String tableName, Params params) {
+    return getMany(DEFAULT_API_PATH, tableName, params);
+  }
+  public List<ObjectNode> getMany(String apiPath, String tableName, Params params) {
+    List<ObjectNode> l = findMany(apiPath, tableName, params);
     if (l.isEmpty()) {
       throw new IncorrectResultSizeException("Expected more than zero records from query.");
     }
@@ -207,8 +325,12 @@ public class ObjectNodeTemplate
   }
 
   
-  public ObjectNode  getOne(Params params) {
-    ObjectNode on = findOne(params);
+
+  public ObjectNode  getOne(String tableName, Params params) {
+    return getOne(DEFAULT_API_PATH, tableName, params);
+  }
+  public ObjectNode  getOne(String apiPath, String tableName, Params params) {
+    ObjectNode on = findOne(apiPath, tableName, params);
     if (on == null) {
       throw new IncorrectResultSizeException(1, 0);
     }
@@ -216,15 +338,21 @@ public class ObjectNodeTemplate
   }
   
   
-  public ObjectNode findOne(Params params) {
-    List<ObjectNode> l = findMany(params);
+  public ObjectNode findOne(String tableName, Params params) {
+    return findOne(DEFAULT_API_PATH, tableName, params);
+  }
+  public ObjectNode findOne(String apiPath, String tableName, Params params) {
+    List<ObjectNode> l = findMany(apiPath, tableName, params);
     if (l.size() == 0) { return null; }
     if (l.size() == 1) { return l.get(0); }
     throw new IncorrectResultSizeException(1, l.size());
   }
   
   
-  public List<ObjectNode> findMany(Params params) {
+  public List<ObjectNode> findMany(String tableName, Params params) {
+    return findMany(DEFAULT_API_PATH, tableName, params);
+  }
+  public List<ObjectNode> findMany(String apiPath, String tableName, Params params) {
     checkNotNull(params, "Need some params.");
     
     if (logger.isTraceEnabled()) {
@@ -234,7 +362,7 @@ public class ObjectNodeTemplate
     //params.put(TableParams.SYSPARM_QUERY, qs);
     params.putAll(TableParams.SYSPARM_FIELDS, getFieldNames());
 
-    URI thisUri = buildUri(params);
+    URI thisUri = buildUri(apiPath, tableName, params);
     if (logger.isTraceEnabled()) {
       logger.trace("{} findMany() using URI {}", getRestClient().getUserSummary(), thisUri);
     }
@@ -272,14 +400,21 @@ public class ObjectNodeTemplate
   
   
   
-  public void delete(ObjectNode on) {
+  public void delete(String tableName, ObjectNode on) {
+    delete(DEFAULT_API_PATH, tableName, on);
+  }
+  public void delete(String apiPath, String tableName, ObjectNode on) {
     if (on == null) {
       return;
     }
     
-    delete(getString(on, "sys_id"));
+    delete(apiPath, tableName, getString(on, "sys_id"));
   }
-  public void delete(String sysId) {
+  
+  public void delete(String tableName, String sysId) {
+    delete(DEFAULT_API_PATH, tableName, sysId);
+  }
+  public void delete(String apiPath, String tableName, String sysId) {
     if (isBlank(sysId)) {
       logger.trace("delete() received blank sysId.  Returning.");
       return;
@@ -289,13 +424,14 @@ public class ObjectNodeTemplate
       logger.trace("delete() deleting {}", sysId);
     }
     
-    URI thisUri = buildUri(sysId);
+    URI thisUri = buildUri(apiPath, tableName, sysId);
     if (logger.isTraceEnabled()) {
       logger.trace("delete() using URI {}", thisUri);
     }
     
     getRestClient().getRestTemplate().delete(thisUri);
   }
+  
   
   
 }

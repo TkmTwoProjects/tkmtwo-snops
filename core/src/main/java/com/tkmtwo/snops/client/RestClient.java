@@ -28,6 +28,7 @@ public class RestClient
   
   private Instance instance;
   private UserInfo userInfo;
+  private String userSummary;
   
   private List<HttpMessageConverter<?>> messageConverters;
   private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -49,7 +50,8 @@ public class RestClient
   
   public UserInfo getUserInfo() { return userInfo; }
   private void setUserInfo(UserInfo ui) { userInfo = ui; }
-
+  
+  public String getUserSummary() { return userSummary; }
   
   public List<HttpMessageConverter<?>> getMessageConverters() {
     if (messageConverters == null) {
@@ -96,7 +98,7 @@ public class RestClient
                                                                    getUserInfo().getPassword()));
     setRestTemplate(RestTemplates.build(hcrf, getMessageConverters()));
     
-    
+    userSummary = getUserInfo().getUserName() + "@" + getInstance().getName();
   }
   
   protected MappingJackson2HttpMessageConverter defaultJacksonMessageConverter() {
