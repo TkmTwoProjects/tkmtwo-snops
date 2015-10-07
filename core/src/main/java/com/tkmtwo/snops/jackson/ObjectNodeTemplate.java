@@ -131,6 +131,8 @@ public class ObjectNodeTemplate
     if (logger.isTraceEnabled()) {
       logger.trace("{} create(t) received JSON {}", getRestClient().getUserSummary(), objectNode);
     }
+    
+    if (objectNode == null) { return null; }
     visit(objectNode, getReadVisitors());
     return (ObjectNode) objectNode.get(CONTAINER_NODE_NAME);
   }
@@ -189,6 +191,7 @@ public class ObjectNodeTemplate
       logger.trace("{} get() received JSON {}", getRestClient().getUserSummary(), objectNode);
     }
     
+    if (objectNode == null) { return null; }
     visit(objectNode, getReadVisitors());
     return (ObjectNode) objectNode.get(CONTAINER_NODE_NAME);
   }
