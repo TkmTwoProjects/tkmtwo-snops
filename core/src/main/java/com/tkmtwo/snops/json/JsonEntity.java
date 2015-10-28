@@ -3,6 +3,8 @@ package com.tkmtwo.snops.json;
 import static com.google.common.base.ServiceNowConditions.checkSysId;
 import static com.google.common.base.TkmTwoStrings.isBlank;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.MoreObjects;
@@ -21,8 +23,13 @@ import java.util.Objects;
  */
 public class JsonEntity {
   
+  @JsonProperty("instance_name")
   private String serviceNowInstanceName;
+  
+  @JsonProperty("table_name")
   private String serviceNowTableName;
+  
+  @JsonProperty("object_node")
   private ObjectNode objectNode;
   
   
@@ -63,7 +70,7 @@ public class JsonEntity {
   }
   
   
-  
+  @JsonIgnore
   public String getSysId() {
     String sysId = getString("sys_id");
     if (!isBlank(sysId)) { return checkSysId(sysId); }

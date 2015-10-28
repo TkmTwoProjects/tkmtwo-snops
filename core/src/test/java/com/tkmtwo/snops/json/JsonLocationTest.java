@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNull;
 //import static org.junit.Assert.assertTrue;
 //import static org.junit.Assert.fail;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tkmtwo.snops.AbstractSnopsTest;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,8 +18,9 @@ import org.junit.Test;
  */
 public class JsonLocationTest
   extends AbstractSnopsTest {
-  
-  JsonLocationOperations tableOps;
+
+  private ObjectMapper objectMapper;
+  private JsonLocationOperations tableOps;
 
   @Before
   public void setUp() {
@@ -27,6 +29,8 @@ public class JsonLocationTest
     JsonLocationTemplate tableTemplate = new JsonLocationTemplate(getRestClient());
     tableTemplate.afterPropertiesSet();
     tableOps = tableTemplate;
+    
+    objectMapper = new ObjectMapper();
   }
   
   @Test
@@ -82,6 +86,11 @@ public class JsonLocationTest
   
   private void confess(String msg, JsonLocation loc) {
     System.out.println(String.format("%-20s -> %-5s -> %s%n", msg, loc.getObjectNode().size(), loc.toString()));
+    try {
+      System.out.println(String.format("%s%n", objectMapper.writeValueAsString(loc)));
+    } catch (Exception ex) {
+      throw new RuntimeException("Ouch", ex);
+    }
   }
   
 }
