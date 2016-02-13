@@ -24,6 +24,9 @@ public class TableParams {
   public static final Param SYSPARM_DISPLAY_VALUE =
     new Param("sysparm_display_value", ParamType.SCALAR);
   
+  public static final Param SYSPARM_INPUT_DISPLAY_VALUE =
+    new Param("sysparm_input_display_value", ParamType.SCALAR);
+  
   public static final Param SYSPARM_FIELDS =
     new Param("sysparm_fields", ParamType.SET, TkmTwoJointers.COMMA_JOINER);
   
@@ -51,6 +54,7 @@ public class TableParams {
     private List<String> queryValues = EMPTY_LIST;
 
     private boolean displayValue = false;
+    private boolean inputDisplayValue = false;
     private List<String> fields = EMPTY_LIST;
     private String view;
     private String limit;
@@ -75,6 +79,7 @@ public class TableParams {
     public Builder queryValues(String... ss) { queryValues = mkList(ss); return this; }
     
     public Builder displayValue(boolean b) { displayValue = b; return this; }
+    public Builder inputDisplayValue(boolean b) { inputDisplayValue = b; return this; }
     public Builder fields(String... ss) { fields = mkList(ss); return this; }
     public Builder view(String s) { view = s; return this; }
     public Builder limit(String s) { limit = s; return this; }
@@ -96,6 +101,7 @@ public class TableParams {
       }
       
       params.put(SYSPARM_DISPLAY_VALUE, String.valueOf(displayValue));
+      params.put(SYSPARM_INPUT_DISPLAY_VALUE, String.valueOf(inputDisplayValue));
       
       for (String s : fields) { params.put(SYSPARM_FIELDS, s); }
       if (!isBlank(view)) { params.put(SYSPARM_VIEW, view); }

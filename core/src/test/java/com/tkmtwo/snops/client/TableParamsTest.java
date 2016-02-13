@@ -28,6 +28,7 @@ public final class TableParamsTest {
       new TableParams.Builder()
       .query("fname=joe")
       .displayValue(true)
+      .inputDisplayValue(true)
       .fields("field0", "field1", "field2")
       .view("view0")
       .limit("limit0")
@@ -38,6 +39,7 @@ public final class TableParamsTest {
     
     assertEquals("fname=joe", params.getValues(TableParams.SYSPARM_QUERY).get(0));
     assertEquals("true", params.getValues(TableParams.SYSPARM_DISPLAY_VALUE).get(0));
+    assertEquals("true", params.getValues(TableParams.SYSPARM_INPUT_DISPLAY_VALUE).get(0));
     assertEquals("field0,field1,field2", params.getValues(TableParams.SYSPARM_FIELDS).get(0));
     assertEquals("view0", params.getValues(TableParams.SYSPARM_VIEW).get(0));
     assertEquals("limit0", params.getValues(TableParams.SYSPARM_LIMIT).get(0));
@@ -57,6 +59,8 @@ public final class TableParamsTest {
       .queryValues("john")
       .build();
     
+    assertEquals("false", params.getValues(TableParams.SYSPARM_DISPLAY_VALUE).get(0));
+    assertEquals("false", params.getValues(TableParams.SYSPARM_INPUT_DISPLAY_VALUE).get(0));
     assertEquals("fname=john", params.getValues(TableParams.SYSPARM_QUERY).get(0));
     
   }
