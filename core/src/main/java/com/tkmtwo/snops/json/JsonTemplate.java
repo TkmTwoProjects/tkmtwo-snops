@@ -110,6 +110,10 @@ public class JsonTemplate<T extends JsonEntity>
     return newTees(onOps.getMany(params));
   }
 
+  public JsonEntities getManyEntities(Params params) {
+    return newEntiTees(onOps.getMany(params));
+  }
+
 
 
   public T findOne(Params params) {
@@ -120,6 +124,10 @@ public class JsonTemplate<T extends JsonEntity>
   
   public List<T> findMany(Params params) {
     return newTees(onOps.findMany(params));
+  }
+
+  public JsonEntities findManyEntities(Params params) {
+    return newEntiTees(onOps.findMany(params));
   }
 
   
@@ -148,6 +156,14 @@ public class JsonTemplate<T extends JsonEntity>
       tees.add(newTee(on));
     }
     return tees;
+  }
+  
+  @SuppressWarnings("unchecked")
+  private JsonEntities newEntiTees(List<ObjectNode> ons) {
+    JsonEntities jes = new JsonEntities(getRestClient().getInstance().getName(),
+                                        getTableName(),
+                                        ons);
+    return jes;
   }
   
   

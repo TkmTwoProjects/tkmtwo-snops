@@ -3,7 +3,7 @@ package com.tkmtwo.snops.json;
 import com.tkmtwo.hc.uri.Params;
 import com.tkmtwo.snops.client.RestClient;
 import com.tkmtwo.snops.client.TableParams;
-
+import java.util.List;
 
 /**
  *
@@ -28,6 +28,20 @@ public class JsonLocationTemplate
       .queryValues(name)
       .build();
     return findOne(params);
+  }
+  
+  public List<JsonLocation> findRoots() {
+    Params params = new TableParams.Builder()
+      .query("parentISEMPTY")
+      .build();
+    return findMany(params);
+  }
+  
+  public JsonEntities findRootEntities() {
+    Params params = new TableParams.Builder()
+      .query("parentISEMPTY")
+      .build();
+    return findManyEntities(params);
   }
   
 }

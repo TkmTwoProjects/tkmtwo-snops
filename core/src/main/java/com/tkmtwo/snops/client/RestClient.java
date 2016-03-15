@@ -26,6 +26,10 @@ import org.springframework.web.client.RestTemplate;
 public class RestClient
   implements InitializingBean {
   
+  public static final int CONN_TIMEOUT = 60 * 1000;
+  public static final int CONN_MAX_TOTAL = 50;
+  public static final int CONN_MAX_PER_ROUTE = 20;
+  
   private Instance instance;
   private UserInfo userInfo;
   private String userSummary;
@@ -95,7 +99,10 @@ public class RestClient
 
     HttpComponentsClientHttpRequestFactory hcrf = 
       new HttpComponentsClientHttpRequestFactory(HttpClients.build(getUserInfo().getUserName(),
-                                                                   getUserInfo().getPassword()));
+                                                                   getUserInfo().getPassword(),
+                                                                   CONN_TIMEOUT,
+                                                                   CONN_MAX_TOTAL,
+                                                                   CONN_MAX_PER_ROUTE));
     setRestTemplate(RestTemplates.build(hcrf, getMessageConverters()));
     
     userSummary = getUserInfo().getUserName() + "@" + getInstance().getName();

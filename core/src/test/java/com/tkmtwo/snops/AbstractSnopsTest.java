@@ -12,6 +12,8 @@ import java.time.LocalDateTime;
 import java.util.Properties;
 import org.junit.FixMethodOrder;
 import org.junit.runners.MethodSorters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -20,6 +22,8 @@ import org.junit.runners.MethodSorters;
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public abstract class AbstractSnopsTest {
+  
+  protected final Logger logger = LoggerFactory.getLogger(getClass()); 
   
   private String startAt = null;
   private RestClient restClient;

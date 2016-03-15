@@ -13,20 +13,27 @@ import com.tkmtwo.hc.uri.Params;
 import com.tkmtwo.snops.AbstractSnopsTest;
 import com.tkmtwo.snops.client.TableParams;
 import java.time.LocalDateTime;
-//import java.util.List;
-//import java.util.concurrent.ExecutorService;
-//import java.util.concurrent.Executors;
-//import java.util.concurrent.TimeUnit;
-//import java.util.stream.*;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.*;
 import org.junit.Before;
 import org.junit.Test;
+
+import org.junit.FixMethodOrder;
+import org.junit.runners.MethodSorters;
+
 
 /**
  *
  *
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class SimpleObjectNodeTemplateTest
   extends AbstractSnopsTest {
+  
+  private static final String BIG_LIMIT = "100000";
   
   SimpleObjectNodeTemplate onTemplate = null;
 
@@ -58,15 +65,15 @@ public class SimpleObjectNodeTemplateTest
 
     assertEquals(incOne, incTwo);
     
+    /*
     //Quickie test of on update...
     ObjectNode udOn = JsonNodeFactory.instance.objectNode();
     udOn.put("sys_id", incOne.get("sys_id"));
     udOn.put("short_description", "Some short descr at " + LocalDateTime.now().toString());
     System.out.println("Sending: " + udOn.toString());
     System.out.println(onTemplate.update(tableName, udOn));
+    */
     
-    //System.out.println(incOne);
-    //System.out.println(incTwo);
   }
   
 
@@ -88,7 +95,7 @@ public class SimpleObjectNodeTemplateTest
     }
   }
   
-  ////@Test
+  //@Test
   public void test00020PopulateUNameStream() {
     List<ObjectNode> sysUsers =
       onTemplate.findMany("sys_user",
@@ -198,39 +205,213 @@ public class SimpleObjectNodeTemplateTest
     
   }
   
+  */  
   
-  //
-  @Test
-  public void test00021PurgeThese() {
-    System.out.println("STREAMPURGING");
+
+  //@Test
+  public void testPurgeBReferences() {
+    String tableName = "u_int_reference";
+    
     List<ObjectNode> ons =
-      onTemplate.findMany("cmdb_ci",
+      onTemplate.findMany(tableName,
                           new TableParams.Builder()
-                          .query("company=c902ec79377f82408ac465e2b3990ef3^sys_created_by=muizz.waljee.admin")
+                          .query("u_taskISEMPTY")
+                          .fields("sys_id", "u_exchange")
+                          .limit(BIG_LIMIT)
                           .build());
+    logger.info("There are '" + ons.size() + "' u_int_reference records to delete.");
     
     
-    ExecutorService execSvc = Executors.newFixedThreadPool(10);
+    ExecutorService execSvc = Executors.newFixedThreadPool(1);
     ons
       .forEach(i -> {
+          //try { Thread.sleep(200); } catch (Exception ex) { logger.warn(ex.getMessage()); }
           execSvc.submit(() -> {
-              onTemplate.delete("cmdb_ci", i);
-              //System.out.println("BOOM: " + i.get("sys_id"));
+              logger.info("DELETING: " + i);
+              onTemplate.delete(tableName, i);
             });
         }
         );
-
+    
     execSvc.shutdown();
     try {
-      execSvc.awaitTermination(3600, TimeUnit.SECONDS);
+      execSvc.awaitTermination(86400, TimeUnit.SECONDS);
     } catch (InterruptedException interruptedExeption) {
       throw new RuntimeException("Timed out.");
     }
     
     
+    
+    
   }
-  */  
+  
+  
+  //@Test
+  public void testPurgeBOlogs() {
+    String tableName = "u_int_olog";
+    
+    List<ObjectNode> ons =
+      onTemplate.findMany(tableName,
+                          new TableParams.Builder()
+                          .query("u_taskISEMPTY")
+                          .fields("sys_id", "u_subscription")
+                          .limit(BIG_LIMIT)
+                          .build());
+    logger.info("There are '" + ons.size() + "' u_int_olog records to delete.");
+    
+    
+    ExecutorService execSvc = Executors.newFixedThreadPool(1);
+    ons
+      .forEach(i -> {
+          //try { Thread.sleep(200); } catch (Exception ex) { logger.warn(ex.getMessage()); }
+          execSvc.submit(() -> {
+              logger.info("DELETING: " + i);
+              onTemplate.delete(tableName, i);
+            });
+        }
+        );
+    
+    execSvc.shutdown();
+    try {
+      execSvc.awaitTermination(86400, TimeUnit.SECONDS);
+    } catch (InterruptedException interruptedExeption) {
+      throw new RuntimeException("Timed out.");
+    }
+    
+    
+    
+    
+  }
+  
+  
+  
+  //@Test
+  public void testPurgeBOErrors() {
+    String tableName = "u_int_oerror";
+    
+    List<ObjectNode> ons =
+      onTemplate.findMany(tableName,
+                          new TableParams.Builder()
+                          .query("u_taskISEMPTY")
+                          .fields("sys_id", "u_subscription")
+                          .limit(BIG_LIMIT)
+                          .build());
+    logger.info("There are '" + ons.size() + "' u_int_oerror records to delete.");
+    
+    
+    ExecutorService execSvc = Executors.newFixedThreadPool(1);
+    ons
+      .forEach(i -> {
+          //try { Thread.sleep(200); } catch (Exception ex) { logger.warn(ex.getMessage()); }
+          execSvc.submit(() -> {
+              logger.info("DELETING: " + i);
+              onTemplate.delete(tableName, i);
+            });
+        }
+        );
+    
+    execSvc.shutdown();
+    try {
+      execSvc.awaitTermination(86400, TimeUnit.SECONDS);
+    } catch (InterruptedException interruptedExeption) {
+      throw new RuntimeException("Timed out.");
+    }
+    
+    
+    
+    
+  }
 
+  //@Test
+  public void testPurgeAIncident() {
+    String tableName = "incident";
+    
+    
+    List<ObjectNode> ons =
+      onTemplate.findMany(tableName,
+                          new TableParams.Builder()
+                          //.query("company.name=Krakatoa^sys_created_on<javascript:gs.dateGenerate('2016-02-13','00:00:00')")
+                          .query("sys_created_on<javascript:gs.dateGenerate('2016-03-06','00:00:00')")
+                          .fields("sys_id", "number")
+                          .limit(BIG_LIMIT)
+                          //.limit("10")
+                          .build());
+    logger.info("There are '" + ons.size() + "' incident records to delete.");
+    
+    
+    ExecutorService execSvc = Executors.newFixedThreadPool(1);
+    ons
+      .forEach(i -> {
+          try { Thread.sleep(100); } catch (Exception ex) { logger.warn(ex.getMessage()); }
+          execSvc.submit(() -> {
+
+              /*
+              String uref = i.get("u_reference").asText();
+              if (uref != null  && uref.length() == 36) {
+                logger.info("DELETING " + i);
+                onTemplate.delete(tableName, i);
+              }
+              */
+              
+              logger.info("DELETING: " + i);
+              onTemplate.delete(tableName, i);
+
+            });
+        }
+        );
+    
+    execSvc.shutdown();
+    try {
+      execSvc.awaitTermination(86400, TimeUnit.SECONDS);
+    } catch (InterruptedException interruptedExeption) {
+      throw new RuntimeException("Timed out.");
+    }
+    
+    
+    
+    
+  }
+  
+  
+  
+  
+  //@Test
+  public void testPurgeBInboundReferences() {
+    String tableName = "u_int_inbound_reference";
+    
+    List<ObjectNode> ons =
+      onTemplate.findMany(tableName,
+                          new TableParams.Builder()
+                          //.query("u_taskISEMPTY")
+                          //.query("sys_idISNOTEMPTY")
+                          .limit(BIG_LIMIT)
+                          .build());
+    logger.info("There are '" + ons.size() + "' u_int_inbound_reference records to delete.");
+    
+    
+    ExecutorService execSvc = Executors.newFixedThreadPool(1);
+    ons
+      .forEach(i -> {
+          //try { Thread.sleep(200); } catch (Exception ex) { logger.warn(ex.getMessage()); }
+          execSvc.submit(() -> {
+              logger.info("DELETING: " + i);
+              onTemplate.delete(tableName, i);
+            });
+        }
+        );
+    
+    execSvc.shutdown();
+    try {
+      execSvc.awaitTermination(86400, TimeUnit.SECONDS);
+    } catch (InterruptedException interruptedExeption) {
+      throw new RuntimeException("Timed out.");
+    }
+    
+    
+    
+    
+  }
+  
   
   
 }

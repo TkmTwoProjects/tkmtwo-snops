@@ -3,10 +3,11 @@ package com.tkmtwo.snops.json;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-//import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertTrue;
 //import static org.junit.Assert.fail;
 
 import com.tkmtwo.snops.AbstractSnopsTest;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -90,6 +91,16 @@ public class JsonLocationAbbreviatedTest
     
   }
   
+  
+  @Test
+  public void test00010Entities() {
+    List<JsonLocation> rootLocs = tableOps.findRoots();
+    JsonEntities rootEntities = tableOps.findRootEntities();
+
+    assertTrue(rootLocs.size() > 0);
+    assertEquals(rootLocs.size(), rootEntities.getObjectNodes().size());
+    
+  }
   
   private void confess(String msg, JsonLocation loc) {
     System.out.println(String.format("%-20s -> %-5s -> %s%n", msg, loc.getObjectNode().size(), loc.toString()));
