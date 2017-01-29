@@ -11,7 +11,7 @@ subprojects {
   }
   
   group = 'com.tkmtwo'
-  version = '0.4.0'
+  version = '0.5.0'
   
   ext {
     
@@ -34,8 +34,9 @@ subprojects {
     depVersionReflections = '0.9.9'
     depVersionSlf4J = '1.7.12'
     depVersionSpringFramework = '4.2.4.RELEASE'
+    depVersionSpringRetry = '1.1.5.RELEASE'
     depVersionTkmTwoCommon = '1.2.1'
-    depVersionTkmTwoHc = '0.2.0'
+    depVersionTkmTwoHc = '0.4.0'
     depVersionTkmTwoInterpolate = '1.0.0'
     
     

@@ -33,6 +33,7 @@ dependencies {
   compile "com.tkmtwo:tkmtwo-interpolate:${depVersionTkmTwoInterpolate}"
   compile "org.apache.httpcomponents:httpclient:${depVersionHttpClient}"
   compile "org.reflections:reflections:${depVersionReflections}"
+  compile "org.springframework.retry:spring-retry:${depVersionSpringRetry}"
   compile "org.slf4j:slf4j-api:${depVersionSlf4J}"
   
   runtime "ch.qos.logback:logback-classic:${depVersionLogback}"
@@ -58,8 +59,8 @@ jar {
 uploadArchives {
   repositories {
     mavenDeployer {
-      repository(url: "file://$buildDir/repo")
-      //repository(url: "file://$rootDir/../tkmtwo-mvn-repo/release")
+      //repository(url: "file://$buildDir/repo")
+      repository(url: "file://$rootDir/../tkmtwo-mvn-repo/release")
     }
   }
 }

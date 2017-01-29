@@ -19,6 +19,9 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 
+import org.springframework.retry.RetryCallback;
+import org.springframework.retry.RetryContext;
+import org.springframework.web.client.RestClientException;
 
 
 /**
@@ -33,6 +36,7 @@ public class ObjectNodeTemplate
   private List<ObjectNodeVisitor> createVisitors = null;
   private List<ObjectNodeVisitor> readVisitors = null;
   private List<ObjectNodeVisitor> updateVisitors = null;
+  
   
   
   public ObjectNodeTemplate(RestClient rc, String p, String tn) {
@@ -64,7 +68,10 @@ public class ObjectNodeTemplate
       updateVisitors = ImmutableList.of(FieldRemovingObjectNodeVisitor.GLOBAL_DEFAULT_FIELDS_REMOVER);
     }
     
+    
+    
   }
+  
 
   public List<ObjectNodeVisitor> getCreateVisitors() { return createVisitors; }
   public void setCreateVisitors(List<ObjectNodeVisitor> l) { createVisitors = ImmutableList.copyOf(l); }
@@ -126,8 +133,15 @@ public class ObjectNodeTemplate
     }
     
     
-    ObjectNode objectNode =
-      getRestClient().getRestTemplate().postForObject(thisUri, on, ObjectNode.class);
+    //ObjectNode objectNode =
+    //  getRestClient().getRestTemplate().postForObject(thisUri, on, ObjectNode.class);
+    ObjectNode objectNode = 
+      getRestClient().getRetryTemplate().execute(new RetryCallback<ObjectNode, RestClientException>() {
+          public ObjectNode doWithRetry(RetryContext context) throws RestClientException {
+            return getRestClient().getRestTemplate().postForObject(thisUri, on, ObjectNode.class);
+          }
+        });
+    
     if (logger.isTraceEnabled()) {
       logger.trace("{} create(t) received JSON {}", getRestClient().getUserSummary(), objectNode);
     }
@@ -159,7 +173,13 @@ public class ObjectNodeTemplate
       logger.trace("{} update() using URI {}", getRestClient().getUserSummary(), thisUri);
     }
     
-    getRestClient().getRestTemplate().put(thisUri, on);
+    String sr = getRestClient().getRetryTemplate().execute(new RetryCallback<String, RestClientException>() {
+        public String doWithRetry(RetryContext context) throws RestClientException {
+          getRestClient().getRestTemplate().put(thisUri, on);
+          return "UPDATED";
+        }
+      });
+    
     return get(sysId);
   }
 
@@ -186,7 +206,12 @@ public class ObjectNodeTemplate
     }
     
     ObjectNode objectNode =
-      getRestClient().getRestTemplate().getForObject(thisUri, ObjectNode.class);
+      getRestClient().getRetryTemplate().execute(new RetryCallback<ObjectNode, RestClientException>() {
+          public ObjectNode doWithRetry(RetryContext context) throws RestClientException {
+            return getRestClient().getRestTemplate().getForObject(thisUri, ObjectNode.class);
+          }
+        });
+    
     if (logger.isTraceEnabled()) {
       logger.trace("{} get() received JSON {}", getRestClient().getUserSummary(), objectNode);
     }
@@ -244,7 +269,13 @@ public class ObjectNodeTemplate
     
     ObjectNode resultNode = null;
     try {
-      resultNode = getRestClient().getRestTemplate().getForObject(thisUri, ObjectNode.class);
+      //resultNode = getRestClient().getRestTemplate().getForObject(thisUri, ObjectNode.class);
+      resultNode = getRestClient().getRetryTemplate().execute(new RetryCallback<ObjectNode, RestClientException>() {
+          public ObjectNode doWithRetry(RetryContext context) throws RestClientException {
+            return getRestClient().getRestTemplate().getForObject(thisUri, ObjectNode.class);
+          }
+        });
+      
       if (logger.isTraceEnabled()) {
         logger.trace("{} findMany() received JSON {}", getRestClient().getUserSummary(), resultNode);
       }
@@ -253,6 +284,8 @@ public class ObjectNodeTemplate
         return ImmutableList.of();
       }
       throw hcee;
+    } catch (Exception ex) {
+      throw ex;
     }
 
     List<ObjectNode> returnList = new ArrayList<>();
@@ -297,7 +330,14 @@ public class ObjectNodeTemplate
       logger.trace("delete() using URI {}", thisUri);
     }
     
-    getRestClient().getRestTemplate().delete(thisUri);
+    String sr = getRestClient().getRetryTemplate().execute(new RetryCallback<String, RestClientException>() {
+        public String doWithRetry(RetryContext context) throws RestClientException {
+          getRestClient().getRestTemplate().delete(thisUri);
+          return "DELETED";
+        }
+      });
+    
+    
   }
   
   

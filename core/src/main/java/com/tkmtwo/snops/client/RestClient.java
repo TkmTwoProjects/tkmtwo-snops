@@ -19,6 +19,15 @@ import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
+import org.springframework.retry.RetryCallback;
+import org.springframework.retry.RetryContext;
+import org.springframework.retry.RetryPolicy;
+import org.springframework.retry.policy.SimpleRetryPolicy;
+import org.springframework.retry.support.RetryTemplate;
+import java.util.Collections;
+import org.springframework.web.client.RestClientException;
+
+
 /**
  *
  *
@@ -29,6 +38,8 @@ public class RestClient
   public static final int CONN_TIMEOUT = 60 * 1000;
   public static final int CONN_MAX_TOTAL = 50;
   public static final int CONN_MAX_PER_ROUTE = 20;
+  public static final int CONN_RETRY_ATTEMPTS = 6;
+
   
   private Instance instance;
   private UserInfo userInfo;
@@ -38,6 +49,8 @@ public class RestClient
   private MappingJackson2HttpMessageConverter jacksonMessageConverter;
   
   private RestTemplate restTemplate;
+  private RetryTemplate retryTemplate = null;
+
   
   
   public RestClient(Instance i, UserInfo ui) {
@@ -106,8 +119,19 @@ public class RestClient
     setRestTemplate(RestTemplates.build(hcrf, getMessageConverters()));
     
     userSummary = getUserInfo().getUserName() + "@" + getInstance().getName();
+    
+    
+    if (retryTemplate == null) {
+      SimpleRetryPolicy srp = new SimpleRetryPolicy(RestClient.CONN_RETRY_ATTEMPTS,
+                                                    Collections.singletonMap(Exception.class, true));
+      retryTemplate = new RetryTemplate();
+      retryTemplate.setRetryPolicy(srp);
+    }
+
   }
   
+  public RetryTemplate getRetryTemplate() { return retryTemplate; }
+
   protected MappingJackson2HttpMessageConverter defaultJacksonMessageConverter() {
     MappingJackson2HttpMessageConverter jmc = new MappingJackson2HttpMessageConverter();
     jmc.setPrettyPrint(true);

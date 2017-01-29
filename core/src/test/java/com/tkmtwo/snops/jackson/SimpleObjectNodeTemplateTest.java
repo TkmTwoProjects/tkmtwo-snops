@@ -1,12 +1,13 @@
 package com.tkmtwo.snops.jackson;
 
+import static com.google.common.base.TkmTwoStrings.isBlank;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 //import static org.junit.Assert.assertNull;
 //import static org.junit.Assert.assertTrue;
 //import static org.junit.Assert.fail;
 
-
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.tkmtwo.hc.uri.Params;
@@ -45,6 +46,11 @@ public class SimpleObjectNodeTemplateTest
   }
   
   @Test
+  public void testThisHello() {
+    System.out.println("Hello World");
+  }
+  
+  //@Test
   public void test00010FindOneAndGet() {
     String tableName = "incident";
     String incNumber = "INC0000003";
@@ -408,6 +414,105 @@ public class SimpleObjectNodeTemplateTest
     }
     
     
+    
+    
+  }
+  
+  
+  
+
+  public void resolve(String incSysId) {
+    String tableName = "incident";
+    String companySysId = "200163cc37461600c5486ec2b3990edb";
+    String resolverSysId = "b3c96ac50faada00af48abf8b1050e93";
+    String ciSysId = "fcd21fcd0f465200af48abf8b1050e6b";
+    
+    ObjectNode on =
+      onTemplate.findOne(tableName,
+                         new TableParams.Builder()
+                         .queryTemplate("sys_id=${0}")
+                         .queryValues(incSysId)
+                         .fields("sys_id", "company", "state", "assigned_to", "cmdb_ci")
+                         .build());
+    assertNotNull(on);
+    assertEquals(companySysId, on.get("company").asText());
+    
+    if ("6".equals(on.get("state").asText())
+        || "7".equals(on.get("state").asText())) {
+      logger.info("SKIPPING: {}", on);
+      return;
+    }      
+    
+    if (isBlank(on.get("cmdb_ci").asText())) {
+      on.set("cmdb_ci", new TextNode(ciSysId));
+    }
+    
+    //if (!"6".equals(on.get("state").asText())) {
+    on.set("state", new TextNode("6"));
+    on.set("close_code", new TextNode("Closed/Resolved by Caller"));
+    on.set("close_notes", new TextNode("Auto resolving pre-golive."));
+    on.set("assigned_to", new TextNode(resolverSysId));
+    
+    on.remove("company");
+    //on.remove("sys_id");
+    
+    logger.info("RESOLVING: {}", on);
+    onTemplate.save(tableName, on);
+    //}
+    
+    
+  }
+  
+  
+  
+  //@Test
+  public void testHessResolve() {
+    String tableName = "u_int_reference";
+    
+    //String resolverUname = "unknown.user@Hess";
+    String exchangeSysId = "3bed3f520f2a5600bacc244be1050e61";
+    String resolverSysId = "b3c96ac50faada00af48abf8b1050e93";
+    
+    
+    
+    List<ObjectNode> ons =
+      onTemplate.findMany(tableName,
+                          new TableParams.Builder()
+                          //.queryTemplate("sys_created_onONToday@javascript:gs.daysAgoStart(0)@javascript:gs.daysAgoEnd(0)^u_exchange=${0}")
+                          //.queryTemplate("u_exchange=${0}")
+                          //.queryTemplate("u_exchange=${0}^u_task.state!=6^u_task.state!=7")
+                          .queryTemplate("u_exchange=${0}^u_task.state!=6^u_task.state!=7^u_inbound_at<javascript:gs.dateGenerate('2016-04-28','01:00:00')")
+                          .queryValues(exchangeSysId)
+                          .limit(BIG_LIMIT)
+                          //.limit("100")
+                          .build());
+    logger.info("There are '" + ons.size() + "' u_int_reference records for Hess HP OO.");
+    
+    
+    for (ObjectNode on : ons) {
+      resolve(on.get("u_task").asText());
+      //try { Thread.sleep(1000); } catch (Exception ex) { logger.error("ERROR DURING SLEEP: " + ex.getMessage()); }
+    }
+    
+    /*
+    ExecutorService execSvc = Executors.newFixedThreadPool(1);
+    ons
+      .forEach(i -> {
+          try { Thread.sleep(200); } catch (Exception ex) { logger.warn(ex.getMessage()); }
+          execSvc.submit(() -> {
+              logger.info("DELETING: " + i);
+              //onTemplate.delete(tableName, i);
+            });
+        }
+        );
+    
+    execSvc.shutdown();
+    try {
+      execSvc.awaitTermination(86400, TimeUnit.SECONDS);
+    } catch (InterruptedException interruptedExeption) {
+      throw new RuntimeException("Timed out.");
+    }
+    */
     
     
   }
