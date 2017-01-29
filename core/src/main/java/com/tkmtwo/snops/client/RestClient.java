@@ -112,10 +112,7 @@ public class RestClient
 
     HttpComponentsClientHttpRequestFactory hcrf = 
       new HttpComponentsClientHttpRequestFactory(HttpClients.build(getUserInfo().getUserName(),
-                                                                   getUserInfo().getPassword(),
-                                                                   CONN_TIMEOUT,
-                                                                   CONN_MAX_TOTAL,
-                                                                   CONN_MAX_PER_ROUTE));
+                                                                   getUserInfo().getPassword()));
     setRestTemplate(RestTemplates.build(hcrf, getMessageConverters()));
     
     userSummary = getUserInfo().getUserName() + "@" + getInstance().getName();

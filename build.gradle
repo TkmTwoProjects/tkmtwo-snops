@@ -11,7 +11,7 @@ subprojects {
   }
   
   group = 'com.tkmtwo'
-  version = '0.5.1'
+  version = '0.5.2'
   
   ext {
     

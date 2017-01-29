@@ -2,13 +2,13 @@
 
 <configuration>
   <property name="LOG_DIR" value="build/log" />
-  <property name="LOG_LEVEL" value="INFO" />
+  <property name="LOG_LEVEL" value="TRACE" />
 
   <appender name="STDOUT"
     class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
       <pattern>
-        %d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
+        %d{HH:mm:ss.SSS} [%thread] %-5level %t %logger{36} - %msg%n
      </pattern>
     </encoder>
   </appender>
@@ -16,7 +16,7 @@
 
   <!--
       <pattern>%d %-5p %c{1} - %m%n</pattern>
-      <pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
+      <pattern>%-4relative [%thread] %-5level %t %logger{35} - %msg%n</pattern>
 
   -->
   <appender name="FILE" class="ch.qos.logback.core.FileAppender">
