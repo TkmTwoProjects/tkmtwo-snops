@@ -1,8 +1,10 @@
 package com.tkmtwo.snops.jackson;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Strings.nullToEmpty;
 import static com.google.common.base.TkmTwoConditions.checkNotBlank;
 import static com.google.common.base.TkmTwoStrings.isBlank;
+
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -17,10 +19,9 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.client.HttpClientErrorException;
-
 import org.springframework.retry.RetryCallback;
 import org.springframework.retry.RetryContext;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 
 
@@ -179,6 +180,8 @@ public class ObjectNodeTemplate
           return "UPDATED";
         }
       });
+    logger.trace("update() response was {}", nullToEmpty(sr));
+
     
     return get(sysId);
   }
@@ -336,6 +339,7 @@ public class ObjectNodeTemplate
           return "DELETED";
         }
       });
+    logger.trace("delete() response was {}", nullToEmpty(sr));
     
     
   }

@@ -1,9 +1,11 @@
 package com.tkmtwo.snops.jackson;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Strings.nullToEmpty;
 import static com.google.common.base.TkmTwoConditions.checkNotBlank;
 import static com.google.common.base.TkmTwoJointers.COMMA_JOINER;
 import static com.google.common.base.TkmTwoStrings.isBlank;
+
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -22,11 +24,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.http.HttpStatus;
-import org.springframework.util.StringUtils;
-import org.springframework.web.client.HttpClientErrorException;
-
 import org.springframework.retry.RetryCallback;
 import org.springframework.retry.RetryContext;
+import org.springframework.util.StringUtils;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 
 
@@ -279,13 +280,14 @@ public class SimpleObjectNodeTemplate
       logger.trace("{} update() using URI {}", getRestClient().getUserSummary(), thisUri);
     }
 
-    String rs =
+    String sr =
       getRestClient().getRetryTemplate().execute(new RetryCallback<String, RestClientException>() {
           public String doWithRetry(RetryContext context) throws RestClientException {
           getRestClient().getRestTemplate().put(thisUri, on);
           return "OK";
         }
       });
+    logger.trace("update() response was {}", nullToEmpty(sr));
     
     return get(apiPath, tableName, sysId);
   }
@@ -457,13 +459,15 @@ public class SimpleObjectNodeTemplate
       logger.trace("delete() using URI {}", thisUri);
     }
     
-    String rs =
+    String sr =
       getRestClient().getRetryTemplate().execute(new RetryCallback<String, RestClientException>() {
           public String doWithRetry(RetryContext context) throws RestClientException {
             getRestClient().getRestTemplate().delete(thisUri);
             return "DELETED";
           }
         });
+    logger.trace("delete() response was {}", nullToEmpty(sr));
+
     
   }
   

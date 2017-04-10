@@ -1,21 +1,21 @@
 package com.tkmtwo.snops.json;
 
-import static com.google.common.base.ServiceNowConditions.checkSysId;
-import static com.google.common.base.TkmTwoStrings.isBlank;
+//import static com.google.common.base.ServiceNowConditions.checkSysId;
+//import static com.google.common.base.TkmTwoStrings.isBlank;
 
 //import com.google.common.collect.ImmutableSet;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+//import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+//import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.MoreObjects;
-import com.tkmtwo.snops.time.DateTimeFormatters;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+//import com.tkmtwo.snops.time.DateTimeFormatters;
+//import java.time.LocalDate;
+//import java.time.LocalDateTime;
+//import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+//import java.util.Objects;
 
 /**
  *

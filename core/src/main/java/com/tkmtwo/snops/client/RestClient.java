@@ -3,6 +3,7 @@ package com.tkmtwo.snops.client;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.TkmTwoConditions.checkNotBlank;
 
+
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.google.common.base.MoreObjects;
 import com.tkmtwo.hc.client.HttpClients;
@@ -11,21 +12,20 @@ import com.tkmtwo.hc.uri.UserInfo;
 import com.tkmtwo.snops.Instance;
 import com.tkmtwo.snops.jackson.ServiceNowModule;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.web.client.RestTemplate;
-
-import org.springframework.retry.RetryCallback;
-import org.springframework.retry.RetryContext;
-import org.springframework.retry.RetryPolicy;
+//import org.springframework.retry.RetryCallback;
+//import org.springframework.retry.RetryContext;
+//import org.springframework.retry.RetryPolicy;
 import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.retry.support.RetryTemplate;
-import java.util.Collections;
-import org.springframework.web.client.RestClientException;
+//import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
 
 /**
