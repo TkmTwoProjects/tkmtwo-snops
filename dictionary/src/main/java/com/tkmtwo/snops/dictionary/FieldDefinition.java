@@ -7,25 +7,28 @@ import com.google.common.base.MoreObjects;
 
 public final class FieldDefinition {
   
-  @JsonProperty("table_name")
+  //@JsonProperty("table_name")
   private String tableName;
   
-  @JsonProperty("column_name")
+  //@JsonProperty("column_name")
   private String columnName;
   
-  @JsonProperty("column_label")
+  //@JsonProperty("column_label")
   private String columnLabel;
   
-  @JsonProperty("internal_type")
+  //@JsonProperty("internal_type")
   private InternalType internalType;
   
-  @JsonProperty("reference")
+  //@JsonProperty("glide_type")
+  private GlideType glideType;
+  
+  //@JsonProperty("reference")
   private String reference;
   
-  @JsonProperty("reference_key")
+  //@JsonProperty("reference_key")
   private String referenceKey;
   
-  @JsonProperty("max_length")
+  //@JsonProperty("max_length")
   private int maxLength;
   
   public FieldDefinition() { ; }
@@ -35,6 +38,7 @@ public final class FieldDefinition {
     setColumnName(sd.getElement());
     setColumnLabel(sd.getColumnLabel());
     setInternalType(InternalType.from(sd.getInternalType()));
+    setGlideType(getInternalType().glideType());
     setReference(sd.getReference());
     setReferenceKey(sd.getReferenceKey());
     setMaxLength(sd.getMaxLength());
@@ -51,7 +55,15 @@ public final class FieldDefinition {
   
   public InternalType getInternalType() { return internalType; }
   private void setInternalType(InternalType it) { internalType = it; }
-  //private void setInternalType(String s) { internalType = InternalType.from(s); }
+
+  public GlideType getGlideType() {
+    if (glideType == null && internalType != null) {
+      glideType = internalType.glideType();
+    }
+    return glideType;
+  }
+  private void setGlideType(GlideType it) { glideType = it; }
+
   
   public String getReference() { return reference; }
   private void setReference(String s) { reference = s; }
@@ -69,7 +81,7 @@ public final class FieldDefinition {
       .add("columnName", getColumnName())
       .add("columnLabel", getColumnLabel())
       .add("internalType", getInternalType())
-      .add("glideType", getInternalType().glideType())
+      .add("glideType", getGlideType())
       .add("reference", getReference())
       .add("referenceKey", getReferenceKey())
       .add("maxLength", getMaxLength())

@@ -89,6 +89,16 @@ public class JsonEntity {
     }
     return null;
   }
+  
+  public String getFirstString(String... names) {
+    for (String name : names) {
+      if (getObjectNode().has(name)) {
+        return getString(name);
+      }
+    }
+    return null;
+  }
+  
   public boolean getBoolean(String s) {
     if (getObjectNode().hasNonNull(s)) {
       return getObjectNode().get(s).asBoolean();

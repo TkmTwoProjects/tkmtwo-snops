@@ -8,35 +8,28 @@ import com.tkmtwo.snops.map.MappedEntity;
  * A ServiceNow table
  *
  */
-public class SysDbObject
+public class SysGlideObject
   extends MappedEntity {
   
   @JsonProperty("name")
   private String name;
   
-  @JsonProperty("sys_class_name")
-  private String sysClassName;
+  @JsonProperty("label")
+  private String label;
   
-  @JsonProperty("super_class")
-  private String superClass;
-  
-  @JsonProperty("is_extendable")
-  private boolean extendable;
-  
+  @JsonProperty("scalar_type")
+  private String scalarType;
   
   
   
   public String getName() { return name; }
   public void setName(String s) { name = s; }
   
-  public String getSysClassName() { return sysClassName; }
-  public void setSysClassName(String s) { sysClassName = s; }
+  public String getLabel() { return label; }
+  public void setLabel(String s) { label = s; }
   
-  public String getSuperClass() { return superClass; }
-  public void setSuperClass(String s) { superClass = s; }
-  
-  public boolean getExtendable() { return extendable; }
-  public void setExtendable(boolean b) { extendable = b; }
+  public String getScalarType() { return scalarType; }
+  public void setScalarType(String s) { scalarType = s; }
   
   
   
@@ -57,9 +50,8 @@ public class SysDbObject
       .add("serviceNowTableName", getServiceNowTableName())
       .add("sysId", getSysId())
       .add("name", getName())
-      .add("sysClassName", getSysClassName())
-      .add("superClass", getSuperClass())
-      .add("extendable", getExtendable())
+      .add("label", getLabel())
+      .add("scalarType", getScalarType())
       .toString();
   }
   

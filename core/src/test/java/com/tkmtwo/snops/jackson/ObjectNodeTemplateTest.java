@@ -34,7 +34,8 @@ public class ObjectNodeTemplateTest
   @Test
   public void test00010FindOneAndGet() {
     Params params = new TableParams.Builder()
-      .query("number=INC0000003")
+      //.query("number=INC0000003")
+      .query("number=INC0185924")
       .build();
     ObjectNode incOne = onOps.findOne(params);
     assertNotNull(incOne);

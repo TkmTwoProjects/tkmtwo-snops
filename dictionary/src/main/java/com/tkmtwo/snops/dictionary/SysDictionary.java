@@ -7,7 +7,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.MoreObjects;
 import com.tkmtwo.snops.map.MappedEntity;
 
-
+/**
+ *
+ * A ServiceNow dictionary entry for a column.
+ *
+ */
 public class SysDictionary
   extends MappedEntity {
   

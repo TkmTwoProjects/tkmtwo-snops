@@ -11,21 +11,28 @@ import java.util.Map;
 
 public final class TableDefinition {
   
-  @JsonProperty("name")
-  private String name;
+  @JsonProperty("instanceName")
+  private String instanceName;
+
+  @JsonProperty("tableName")
+  private String tableName;
 
   @JsonProperty("fields")
   private Map<String, FieldDefinition> fields;
   
   public TableDefinition() { ; }
   public TableDefinition(SysDbObject sdo, List<SysDictionary> sds) {
-    setName(sdo.getName());
+    setInstanceName(sdo.getServiceNowInstanceName());
+    setTableName(sdo.getName());
     setFieldsFromSysDictionaries(sds);
   }
   
   
-  public String getName() { return name; }
-  private void setName(String s) { name = s; }
+  public String getInstanceName() { return instanceName; }
+  private void setInstanceName(String s) { instanceName = s; }
+  
+  public String getTableName() { return tableName; }
+  private void setTableName(String s) { tableName = s; }
   
   public Map<String, FieldDefinition> getFields() { return fields; }
   private void setFields(Map<String, FieldDefinition> l) { fields = l; }
@@ -65,7 +72,8 @@ public final class TableDefinition {
   @Override
   public String toString() {
     return MoreObjects.toStringHelper(this)
-      .add("name", getName())
+      .add("instanceName", getInstanceName())
+      .add("tableName", getTableName())
       .add("numberOfFields", getFields().size())
       .toString();
   }
